@@ -12,14 +12,14 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.fhanafi.cerdikia.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_rangking"
+        android:name="com.fhanafi.cerdikia.ui.rangking.RangkingFragment"
+        android:label="@string/title_rangking"
+        tools:layout="@layout/fragment_rangking" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.fhanafi.cerdikia.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_shop"
+        android:name="com.fhanafi.cerdikia.ui.shop.ShopFragment"
+        android:label="@string/title_shop"
+        tools:layout="@layout/fragment_shop" />
 </navigation>
