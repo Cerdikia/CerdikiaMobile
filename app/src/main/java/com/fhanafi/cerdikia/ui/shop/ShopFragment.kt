@@ -1,4 +1,4 @@
-package com.fhanafi.cerdikia.ui.dashboard
+package com.fhanafi.cerdikia.ui.shop
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.fhanafi.cerdikia.databinding.FragmentDashboardBinding
+import com.fhanafi.cerdikia.databinding.FragmentShopBinding
 
-class DashboardFragment : Fragment() {
+class ShopFragment : Fragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
+    private var _binding: FragmentShopBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,14 +22,14 @@ class DashboardFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+        val shopViewModel =
+            ViewModelProvider(this).get(ShopViewModel::class.java)
 
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentShopBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
+        val textView: TextView = binding.textNotifications
+        shopViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

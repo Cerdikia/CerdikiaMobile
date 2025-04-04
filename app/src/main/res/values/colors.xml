@@ -13,4 +13,5 @@
     <color name="blueBackground">#8000A2EA</color>
     <color name="redBackground">#F4B0B2</color>
     <color name="swipeSection">#2A7EA4</color>
+    <color name="transparent">#00FFFFFF</color>
 </resources>
