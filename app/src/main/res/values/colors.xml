@@ -14,4 +14,5 @@
     <color name="redBackground">#F4B0B2</color>
     <color name="swipeSection">#2A7EA4</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="gray">#D9D9D9</color>
 </resources>
