@@ -2,7 +2,9 @@ package com.fhanafi.cerdikia.ui.rangking
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.ItemRangkingBinding
 
 class RankingAdapter(private val rankingList: List<RankingItem>) :
@@ -13,11 +15,18 @@ class RankingAdapter(private val rankingList: List<RankingItem>) :
         val profilePlaceholderView = binding.viewProfilePlaceholder
         val playerNameTextView = binding.textViewPlayerName
         val xpTextView = binding.textViewXP
+        val rootLayout = binding.rangkingItemRoot
 
         fun bind(item: RankingItem) {
             rankTextView.text = item.rank.toString()
-            playerNameTextView.text = item.name
+            playerNameTextView.text = item.playerName
             xpTextView.text = "${item.xp} XP"
+
+            if(item.isCurrentUser){
+                rootLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.highlightBlue))
+            }else{
+                rootLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.white))
+            }
         }
     }
 
