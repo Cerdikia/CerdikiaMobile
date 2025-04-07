@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:gravity="center"
-        android:text="@string/motivation_text"
+        android:text="@string/login_description"
         android:textAlignment="center"
         android:textColor="#333333"
         android:textSize="22sp"
