@@ -2,28 +2,26 @@ package com.fhanafi.cerdikia
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.fhanafi.cerdikia.databinding.ActivityMainBinding
 import com.fhanafi.cerdikia.ui.components.BottomNavItem
 import com.fhanafi.cerdikia.ui.components.CustomBottomNavigationBar
-import com.fhanafi.cerdikia.ui.components.CustomTopBar
+import com.fhanafi.cerdikia.ui.components.PlayerStatusBar
 import com.fhanafi.cerdikia.ui.components.theme.CerdikiaTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -95,18 +93,26 @@ class MainActivity : AppCompatActivity() {
     private fun setupTopBar() {
         val composeTopBar = findViewById<ComposeView>(R.id.compose_top_bar)
         composeTopBar.setContent {
-            val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(null)
-            val currentDestination = currentBackStackEntry?.destination
+            val mainViewModel : MainViewModel = viewModel() // Corrected variable name
+            val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(null)
+            val currentDestination = navBackStackEntry?.destination
+
+            val currentFlag by mainViewModel.playerFlag.collectAsState() // Use mainViewModel
+            val currentGems by mainViewModel.playerGems.collectAsState() // Use mainViewModel
+            val currentEnergy by mainViewModel.playerEnergy.collectAsState() // Use mainViewModel
 
             CerdikiaTheme {
                 val statusBarInsets = WindowInsets.statusBars.asPaddingValues()
                 Column(modifier = Modifier.fillMaxWidth().padding(statusBarInsets)) {
                     when (currentDestination?.id) {
-                        R.id.navigation_home -> {
-                            CustomTopBar(title = "Home")
-                        }
-                        R.id.navigation_shop -> {
-                            CustomTopBar(title = "Shop")
+                        R.id.navigation_home, R.id.navigation_shop -> {
+                            PlayerStatusBar(
+                                flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
+                                gemImageResourceId = R.drawable.ic_gems,
+                                gemCount = mainViewModel.playerGems, // Use mainViewModel
+                                energyImageResourceId = R.drawable.ic_lighting,
+                                energyCount = mainViewModel.playerEnergy // Use mainViewModel
+                            )
                         }
                         else -> {
                             Spacer(modifier = Modifier.height(0.dp))
