@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Cerdikia"
         tools:targetApi="31">
         <activity
+            android:name=".ui.completion.CompletionActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.loading.LoadingActivity"
             android:exported="false" />
         <activity
@@ -28,7 +31,7 @@
             android:name=".MainActivity"
             android:exported="false"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>

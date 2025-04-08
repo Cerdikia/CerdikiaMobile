@@ -10,4 +10,6 @@
     <string name="home_title">Bagian 1 : Judul</string>
     <string name="loading_title">Memuat....</string>
     <string name="loading_description">Setiap detik adalah kesempatan belajar dan berkembang! Siap naik ke level berikutnya?</string>
+    <string name="completion_title">Latihan Selesai!</string>
+    <string name="cd_totalXp">Total XP Placeholder</string>
 </resources>
