@@ -21,7 +21,7 @@ fun CustomBottomNavigationBar(
     items: List<BottomNavItem>,
     onItemClick: (BottomNavItem) -> Unit
 ) {
-    val selectedItemIndex = remember { mutableStateOf(items.indexOfFirst { it.isSelected }) }
+//    val selectedItemIndex = remember { mutableStateOf(items.indexOfFirst { it.isSelected }) }
 
     Row(
         modifier = Modifier
@@ -38,7 +38,7 @@ fun CustomBottomNavigationBar(
             ) {
                 IconButton(
                     onClick = {
-                        onItemClick(item.copy(isSelected = true))
+                        onItemClick(item)
                     },
                     modifier = Modifier.size(48.dp)
                 ) {

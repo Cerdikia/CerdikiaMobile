@@ -1,6 +1,7 @@
 package com.fhanafi.cerdikia
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBars
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private val mainViewModel: MainViewModel by viewModels() // Gunakan viewModels() untuk mendapatkan ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,44 +50,44 @@ class MainActivity : AppCompatActivity() {
 
         setupBottomNavigationBar()
         setupTopBar()
+        destinationListener()
     }
 
     private fun setupBottomNavigationBar() {
-        val composeBottomNav = findViewById<ComposeView>(R.id.compose_bottom_nav)
-        composeBottomNav.setContent {
-            CerdikiaTheme { // Wrap your Compose content with your theme
-                var selectedRoute by remember { mutableStateOf(R.id.navigation_home) }
+        binding.composeBottomNav.setContent {
+            CerdikiaTheme {
+                BottomNavigationBarCompose(viewModel = mainViewModel, navController = navController)
+            }
+        }
+    }
 
-                val items = remember(selectedRoute) {
-                    listOf(
-                        BottomNavItem(
-                            "Home",
-                            R.drawable.ic_homebotnav,
-                            R.id.navigation_home,
-                            selectedRoute == R.id.navigation_home
-                        ),
-                        BottomNavItem(
-                            "Rangking",
-                            R.drawable.ic_rangkingbotnav,
-                            R.id.navigation_rangking,
-                            selectedRoute == R.id.navigation_rangking
-                        ),
-                        BottomNavItem(
-                            "Shop",
-                            R.drawable.ic_shopbotnav,
-                            R.id.navigation_shop,
-                            selectedRoute == R.id.navigation_shop
-                        )
-                    )
-                }
+    @Composable
+    fun BottomNavigationBarCompose(viewModel: MainViewModel, navController: NavController) {
+        val selectedRoute by viewModel.selectedRoute.collectAsState()
 
-                CustomBottomNavigationBar(
-                    items = items,
-                    onItemClick = { item ->
-                        selectedRoute = item.route
-                        navController.navigate(item.route)
-                    }
-                )
+        val items = remember(selectedRoute) {
+            listOf(
+                BottomNavItem("Home", R.drawable.ic_homebotnav, R.id.navigation_home, selectedRoute == R.id.navigation_home),
+                BottomNavItem("Rangking", R.drawable.ic_rangkingbotnav, R.id.navigation_rangking, selectedRoute == R.id.navigation_rangking),
+                BottomNavItem("Shop", R.drawable.ic_shopbotnav, R.id.navigation_shop, selectedRoute == R.id.navigation_shop)
+            )
+        }
+
+        CustomBottomNavigationBar(
+            items = items,
+            onItemClick = { item ->
+                viewModel.updateSelectedRoute(item.route)
+                navController.navigate(item.route)
+            }
+        )
+    }
+
+    private fun destinationListener() {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_home -> mainViewModel.updateSelectedRoute(R.id.navigation_home)
+                R.id.navigation_rangking -> mainViewModel.updateSelectedRoute(R.id.navigation_rangking)
+                R.id.navigation_shop -> mainViewModel.updateSelectedRoute(R.id.navigation_shop)
             }
         }
     }
@@ -93,7 +95,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupTopBar() {
         val composeTopBar = findViewById<ComposeView>(R.id.compose_top_bar)
         composeTopBar.setContent {
-            val mainViewModel : MainViewModel = viewModel() // Corrected variable name
             val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(null)
             val currentDestination = navBackStackEntry?.destination
 
