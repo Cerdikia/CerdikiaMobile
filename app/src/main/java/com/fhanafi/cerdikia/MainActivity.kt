@@ -101,12 +101,13 @@ class MainActivity : AppCompatActivity() {
             val currentFlag by mainViewModel.playerFlag.collectAsState() // Use mainViewModel
             val currentGems by mainViewModel.playerGems.collectAsState() // Use mainViewModel
             val currentEnergy by mainViewModel.playerEnergy.collectAsState() // Use mainViewModel
-
+            // setting theme for choosing which fragment did have to use topbar in components.theme
             CerdikiaTheme {
                 val statusBarInsets = WindowInsets.statusBars.asPaddingValues()
                 Column(modifier = Modifier.fillMaxWidth().padding(statusBarInsets)) {
                     when (currentDestination?.id) {
-                        R.id.navigation_home, R.id.navigation_shop -> {
+                        //Adding the id in here for showing the topbar in the specific Fragment
+                        R.id.navigation_home, R.id.navigation_shop, R.id.stageFragment -> {
                             PlayerStatusBar(
                                 flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
                                 gemImageResourceId = R.drawable.ic_gems,

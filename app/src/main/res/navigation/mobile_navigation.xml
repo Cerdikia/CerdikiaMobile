@@ -9,8 +9,26 @@
         android:id="@+id/navigation_home"
         android:name="com.fhanafi.cerdikia.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
-
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_stageFragment"
+            app:destination="@id/stageFragment">
+            <argument
+                android:name="materiId"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/stageFragment"
+        android:name="com.fhanafi.cerdikia.ui.stage.StageFragment"
+        android:label="StageFragment"
+        tools:layout="@layout/fragment_stage">
+        <argument
+            android:name="materiId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_rangking"
         android:name="com.fhanafi.cerdikia.ui.rangking.RangkingFragment"

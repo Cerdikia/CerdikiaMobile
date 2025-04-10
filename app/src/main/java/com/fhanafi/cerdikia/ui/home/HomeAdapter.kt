@@ -1,10 +1,12 @@
 package com.fhanafi.cerdikia.ui.home
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
 
@@ -31,7 +33,11 @@ class HomeAdapter(private val itemList: List<HomePlaceHolderItem>) :
         holder.descriptionTextView.text = currentItem.description
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
-            // Handle button click
+            val materiId = position + 1 // Example: Use the position as a simple ID. You might need a more specific ID from your data.
+            val bundle = Bundle().apply {
+                putInt("materiId", materiId)
+            }
+            holder.itemView.findNavController().navigate(R.id.action_navigation_home_to_stageFragment, bundle)
         }
     }
 
