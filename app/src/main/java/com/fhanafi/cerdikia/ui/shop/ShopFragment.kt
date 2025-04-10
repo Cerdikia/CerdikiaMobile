@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.FragmentShopBinding
 
 class ShopFragment : Fragment() {
@@ -32,7 +35,17 @@ class ShopFragment : Fragment() {
         shopViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+        onBackButtonPressed()
         return root
+    }
+
+    private fun onBackButtonPressed(){
+        val callback = object : OnBackPressedCallback(true /* enabled by default */) {
+            override fun handleOnBackPressed() {
+                findNavController().navigate(R.id.navigation_home)
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     override fun onDestroyView() {

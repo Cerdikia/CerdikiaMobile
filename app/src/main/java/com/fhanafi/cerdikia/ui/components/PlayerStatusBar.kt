@@ -93,7 +93,7 @@ fun PlayerStatusBar(
             }
         },
         modifier = Modifier.fillMaxWidth(),
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color(0xFF00A2EA)
         )
     )

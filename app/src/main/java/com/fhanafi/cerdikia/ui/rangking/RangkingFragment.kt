@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.FragmentRangkingBinding
@@ -64,6 +66,9 @@ class RangkingFragment : Fragment() {
             adapter = RankingAdapter(PlayerRangkingList)
         }
 
+        // Handle back button press
+        onBackButtonPressed()
+
         return root
     }
 
@@ -71,6 +76,15 @@ class RangkingFragment : Fragment() {
         super.onStop()
         (activity as? AppCompatActivity)?.supportActionBar?.show() // still buggy
     }*/
+
+    private fun onBackButtonPressed() {
+        val callback = object : OnBackPressedCallback(true /* enabled by default */) {
+            override fun handleOnBackPressed() {
+                findNavController().navigate(R.id.navigation_home)
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

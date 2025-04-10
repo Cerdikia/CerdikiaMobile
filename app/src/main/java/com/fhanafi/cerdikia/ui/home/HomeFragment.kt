@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -72,7 +74,7 @@ class HomeFragment : Fragment() {
                 }
             }
         })
-
+        exitApp()
         return root
     }
 
@@ -105,6 +107,15 @@ class HomeFragment : Fragment() {
                 if (index == position) R.drawable.indicator_selected else R.drawable.indicator_default
             )
         }
+    }
+
+    private fun exitApp(){
+        val callback = object: OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     override fun onDestroyView() {
