@@ -3,6 +3,7 @@ package com.fhanafi.cerdikia.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +60,7 @@ fun CustomBottomNavigationBar(
             }
         }
     }
+    HorizontalDivider(thickness = 1.5.dp, color = Color(159, 159,159))
 }
 
 //@Preview(showBackground = true)
