@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginEnd="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    android:backgroundTint="@color/gray"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/img_shopAsset"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/img_pencil"
+            app:layout_constraintBottom_toTopOf="@+id/btn_shop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_shop"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_button"
+            app:layout_constraintTop_toBottomOf="@+id/img_shopAsset"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tv_shopPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:elevation="2dp"
+            android:text="1000"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:layout_marginEnd="4dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_shop"
+            app:layout_constraintEnd_toEndOf="@+id/btn_shop"
+            app:layout_constraintStart_toEndOf="@+id/img_shopGems"
+            app:layout_constraintTop_toTopOf="@+id/btn_shop"
+            app:layout_constraintVertical_bias="0.153" />
+
+        <ImageView
+            android:id="@+id/img_shopGems"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:elevation="2dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_gems"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_shop"
+            app:layout_constraintStart_toStartOf="@+id/btn_shop"
+            app:layout_constraintTop_toTopOf="@+id/btn_shop"
+            app:layout_constraintEnd_toStartOf="@+id/tv_shopPrice"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
