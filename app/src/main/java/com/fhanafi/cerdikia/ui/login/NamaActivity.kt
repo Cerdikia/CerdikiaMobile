@@ -4,11 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.fhanafi.cerdikia.databinding.ActivityLoginBinding
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.databinding.ActivityNamaBinding
 
-class LoginActivity : AppCompatActivity() {
+class NamaActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding: ActivityNamaBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,15 +22,16 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupListener(){
-        binding.btnLogin.setOnClickListener {
-            val intent = Intent(this, NamaActivity::class.java)
+        binding.btnNext.setOnClickListener {
+            val intent = Intent(this, KelasActivity::class.java)
             startActivity(intent)
             finish()
         }
     }
 
     private fun initialBinding(){
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivityNamaBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
+
 }
