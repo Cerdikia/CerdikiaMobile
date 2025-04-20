@@ -6,43 +6,6 @@
     android:layout_marginBottom="16dp"
     android:orientation="vertical">
 
-    <!--<androidx.cardview.widget.CardView
-        android:id="@+id/card_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/blueMain"
-        app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/text_materi_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Materi Title"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/text_materi_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Materi Description"
-                android:textColor="@color/white" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>-->
-
     <ImageView
         android:id="@+id/icon_materi"
         android:layout_width="64dp"
@@ -59,8 +22,8 @@
         android:id="@+id/icon_materi2"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="80dp"
         android:contentDescription="Materi Icon"
         android:src="@drawable/ic_lock"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,8 +34,8 @@
         android:id="@+id/icon_materi3"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="250dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="160dp"
         android:contentDescription="Materi Icon"
         android:src="@drawable/ic_lock"
         app:layout_constraintEnd_toEndOf="parent"
@@ -83,8 +46,8 @@
         android:id="@+id/icon_materi4"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="80dp"
         android:contentDescription="Materi Icon"
         android:src="@drawable/ic_lock"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,12 +59,45 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="Materi Icon"
         android:src="@drawable/ic_lock"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/icon_materi4" />
+
+    <ImageView
+        android:id="@+id/icon_materi6"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="120dp"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon_materi5"/>
+
+    <ImageView
+        android:id="@+id/icon_materi7"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="200dp"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon_materi6"/>
+
+    <ImageView
+        android:id="@+id/icon_materi8"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="120dp"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon_materi7"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

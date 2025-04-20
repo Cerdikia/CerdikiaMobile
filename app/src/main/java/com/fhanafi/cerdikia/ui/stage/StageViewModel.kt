@@ -18,16 +18,22 @@ class StageViewModel : ViewModel() {
     //TODO: #3 untuk soal yang sudah selesai icon dari materi berubah menjadi ic_finish dan jika belum menjadi ic_lock dan ic_unlock di mana progress player berada
     private fun loadMateri(){
         _materiList.value = listOf(
-            MateriItem("Materi 1 from VM", "Deskripsi dari ViewModel 1", R.drawable.ic_unlock, 1),
-            MateriItem("Materi 2 from VM", "Deskripsi dari ViewModel 2", R.drawable.ic_lock, 2),
-            MateriItem("Materi 3 from VM", "Deskripsi dari ViewModel 3", R.drawable.ic_lock, 3),
-            MateriItem("Materi 4 from VM", "Deskripsi dari ViewModel 4", R.drawable.ic_lock, 4),
-            MateriItem("Materi 5 from VM", "Deskripsi dari ViewModel 5", R.drawable.ic_lock, 5),
-            MateriItem("Materi 6 from VM", "Deskripsi dari ViewModel 6", R.drawable.ic_lock, 6),
-            MateriItem("Materi 7 from VM", "Deskripsi dari ViewModel 7", R.drawable.ic_lock, 7),
-            MateriItem("Materi 8 from VM", "Deskripsi dari ViewModel 8", R.drawable.ic_lock, 8),
-            MateriItem("Materi 9 from VM", "Deskripsi dari ViewModel 9", R.drawable.ic_lock, 9),
-            MateriItem("Materi 10 from VM", "Deskripsi dari ViewModel 10", R.drawable.ic_lock, 10)
+//            MateriItem("Materi 1 from VM", "Deskripsi dari ViewModel 1", R.drawable.ic_unlock, 1),
+            MateriItem(1),
+            MateriItem(2),
+            MateriItem(3),
+            MateriItem(4),
+            MateriItem(5),
+            MateriItem(6),
+            MateriItem(7),
+            MateriItem(8),
+            MateriItem(9)
         )
+    }
+
+    fun updateMateriCompletion(materiId: Int) {
+        _materiList.value = _materiList.value?.map {
+            if (it.id == materiId) it.copy(isCompleted = true) else it
+        }
     }
 }

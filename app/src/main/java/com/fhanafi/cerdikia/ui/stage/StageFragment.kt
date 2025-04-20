@@ -8,10 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fhanafi.cerdikia.MainViewModel
-import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.UserViewModel
+import com.fhanafi.cerdikia.UserViewModelFactory
+import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
 
 class StageFragment : Fragment() {
@@ -22,9 +23,12 @@ class StageFragment : Fragment() {
     private var _binding: FragmentStageBinding? = null
     private val binding get() = _binding!!
     private val viewModel: StageViewModel by viewModels()
+    private val userViewModel: UserViewModel by activityViewModels {
+        UserViewModelFactory(UserPreference.getInstance(requireContext()))
+    }
+
     private lateinit var adapter: MateriAdapter
 
-    //TODO: #Prioritas di setiap materi misal materi pertama di recycleView menggunakan item_materi yang pertama yang berbentuk C dan materi yang kedua menggunakan item_materi2 yang berbentuk c terbalik
     //TODO: buat arrow_up dan judul dari materi yang diperlihatkan yang berfungsi untuk menclose recycleView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,18 +44,24 @@ class StageFragment : Fragment() {
 
         viewModel.materiList.observe(viewLifecycleOwner, Observer { materiItems ->
             adapter.setData(materiItems) // If using ListAdapter
-//             If not using ListAdapter, you might have adapter.setData(materiItems)
 
-            // Set data ke CardView atas dari item pertama
-            // kemungkinan berubah karena tidak ada stage per materi hanya ada
-            if (materiItems.isNotEmpty()) {
-                val firstItem = materiItems[0]
-                binding.textMateriTitle.text = firstItem.title
-                binding.textMateriDescription.text = firstItem.description
-            }
         })
 
+        setupObserver()
         return root
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setupObserver(){
+        lifecycleScope.launchWhenStarted {
+            userViewModel.userData.collect { userModel ->
+                val completedIds = userModel.completedMateriIds
+                val updatedList = viewModel.materiList.value?.map {
+                    it.copy(isCompleted = completedIds.contains(it.id))
+                } ?: emptyList()
+                adapter.setData(updatedList)
+            }
+        }
     }
 
     override fun onDestroyView() {

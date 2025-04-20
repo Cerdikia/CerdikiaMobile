@@ -50,6 +50,24 @@
             android:id="@+id/action_soalFragment_to_homeFragment"
             app:destination="@id/navigation_home"
             />
+        <action
+            android:id="@+id/action_soalFragment_to_completionFragment"
+            app:destination="@id/completionFragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/completionFragment"
+        android:name="com.fhanafi.cerdikia.ui.completion.CompletionFragment"
+        android:label="Completion" >
+        <argument
+            android:name="XP"
+            app:argType="integer" />
+        <argument
+            android:name="GEMS"
+            app:argType="integer" />
+        <argument
+            android:name="materiId"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/navigation_rangking"

@@ -73,4 +73,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
     androidTestImplementation(platform(libs.androidx.compose.bom)) // Add BOM for Compose testing if needed
+
+    implementation(libs.androidx.datastore.preferences)
 }

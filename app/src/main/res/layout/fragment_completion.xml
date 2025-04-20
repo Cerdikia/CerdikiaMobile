@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.completion.CompletionActivity">
+    tools:context=".ui.completion.CompletionFragment">
 
     <ImageView
         android:id="@+id/img_completion"
@@ -50,6 +50,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/goldYellow"
         android:textSize="24sp"
+        android:textStyle="bold"
         android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="@id/img_placeholderXp"
         app:layout_constraintEnd_toEndOf="@id/img_placeholderXp"
@@ -57,7 +58,7 @@
         app:layout_constraintStart_toStartOf="@id/img_placeholderXp"
         app:layout_constraintTop_toTopOf="@id/img_placeholderXp"
         app:layout_constraintVertical_bias="0.684"
-        tools:text="8 XP" />
+        tools:text="8" />
 
     <Button
         android:id="@+id/btn_completion"
