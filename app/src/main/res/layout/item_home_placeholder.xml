@@ -64,7 +64,7 @@
             android:layout_marginTop="32dp"
             android:backgroundTint="@color/blueMain"
             android:text="Mulai"
-            android:background="@drawable/bg_button"
+            android:background="@drawable/bg_buttonblue"
             android:textColor="@android:color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

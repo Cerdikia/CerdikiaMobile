@@ -1,10 +1,12 @@
 package com.fhanafi.cerdikia.ui.completion
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.ActivityCompletionBinding
 
@@ -18,13 +20,20 @@ class CompletionActivity : AppCompatActivity() {
 
         binding = ActivityCompletionBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar?.hide()
+        val xp = intent.getIntExtra("XP", 0)
+        val gems = intent.getIntExtra("GEMS", 0)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        binding.tvXp.text = "$xp"
+        navigateToHome()
+        //TODO: Bringing the xp and gems to user Data either in api or local storage
+    }
+
+    private fun navigateToHome(){
+        binding.btnCompletion.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
-
-        //TODO: making the tv_xp was change the value based on the right answer in question Activity max 10 xp per 5 question
     }
 }

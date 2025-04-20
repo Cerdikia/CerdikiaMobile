@@ -108,7 +108,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_button"
+        android:background="@drawable/bg_buttonblue"
         android:text="Buat Profil"
         android:textAllCaps="false"
         android:textColor="@color/white"
