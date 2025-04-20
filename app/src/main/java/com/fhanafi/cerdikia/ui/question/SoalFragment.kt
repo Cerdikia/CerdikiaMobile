@@ -1,6 +1,5 @@
 package com.fhanafi.cerdikia.ui.question
 
-import android.content.Intent
 import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,13 +9,9 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
-import com.fhanafi.cerdikia.databinding.FragmentShopBinding
 import com.fhanafi.cerdikia.databinding.FragmentSoalBinding
-import com.fhanafi.cerdikia.ui.completion.CompletionActivity
-import com.fhanafi.cerdikia.ui.home.HomeFragment
 
 class SoalFragment : Fragment() {
 
@@ -27,6 +22,7 @@ class SoalFragment : Fragment() {
     private val viewModel: SoalViewModel by viewModels()
     private var _binding: FragmentSoalBinding? = null
     private val binding get() = _binding!!
+    private var materiId: Int = -1 // Declare at class level
 
     private lateinit var answerOptionAdapter: AnswerOptionAdapter
 
@@ -38,6 +34,7 @@ class SoalFragment : Fragment() {
         _binding = FragmentSoalBinding.inflate(inflater, container, false)
         //Hide bottom navigation
         (activity as? MainActivity)?.setBottomNavigationVisibility(false)
+        materiId = arguments?.getInt("materiId") ?: -1
         closeButton()
         return binding.root
     }
@@ -94,12 +91,16 @@ class SoalFragment : Fragment() {
 
         viewModel.isQuizFinished.observe(viewLifecycleOwner) { isFinished ->
             if (isFinished == true) {
-                val intent = Intent(requireContext(), CompletionActivity::class.java).apply {
-                    putExtra("XP", viewModel.correctAnswers * 2)
-                    putExtra("GEMS", if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0)
+                val xp = viewModel.correctAnswers * 2
+                val gems = if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0
+
+                val bundle = Bundle().apply {
+                    putInt("XP", xp)
+                    putInt("GEMS", gems)
+                    putInt("materiId", materiId)
                 }
-                startActivity(intent)
-                requireActivity().finish() // Close this activity if needed
+
+                findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
             }
         }
     }

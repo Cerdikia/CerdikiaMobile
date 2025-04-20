@@ -1,6 +1,8 @@
 package com.fhanafi.cerdikia
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.navOptions
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
 //        setupActionBarWithNavController(navController, appBarConfiguration)
-
         setupBottomNavigationBar()
         setupTopBar()
         destinationListener()
@@ -71,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             listOf(
                 BottomNavItem("Home", R.drawable.ic_homebotnav, R.id.navigation_home, selectedRoute == R.id.navigation_home),
                 BottomNavItem("Rangking", R.drawable.ic_rangkingbotnav, R.id.navigation_rangking, selectedRoute == R.id.navigation_rangking),
-                BottomNavItem("Shop", R.drawable.ic_shopbotnav, R.id.navigation_shop, selectedRoute == R.id.navigation_shop)
+                BottomNavItem("Shop", R.drawable.ic_shopbotnav, R.id.navigation_shop, selectedRoute == R.id.navigation_shop),
             )
         }
 

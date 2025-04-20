@@ -14,17 +14,54 @@ import com.fhanafi.cerdikia.R
 class MateriAdapter(private var materiList: List<MateriItem>) :
     RecyclerView.Adapter<MateriAdapter.MateriViewHolder>() {
 
-    class MateriViewHolder(itemView: View, adapter: MateriAdapter) : RecyclerView.ViewHolder(itemView) {
-        val iconImageView: ImageView = itemView.findViewById(R.id.icon_materi)
-        private val materiAdapter = adapter
-        init {
-            iconImageView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val materiId = materiAdapter.materiList[position].id
-                    val bundle = Bundle()
-                    bundle.putInt("materiId", materiId)
-                    itemView.findNavController().navigate(R.id.action_stageFragment_to_soalFragment, bundle)
+    companion object {
+        private const val ITEMS_PER_ROW = 8
+    }
+
+    inner class MateriViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val iconImageViews = listOf<ImageView>(
+            itemView.findViewById(R.id.icon_materi),
+            itemView.findViewById(R.id.icon_materi2),
+            itemView.findViewById(R.id.icon_materi3),
+            itemView.findViewById(R.id.icon_materi4),
+            itemView.findViewById(R.id.icon_materi5),
+            itemView.findViewById(R.id.icon_materi6),
+            itemView.findViewById(R.id.icon_materi7),
+            itemView.findViewById(R.id.icon_materi8)
+        )
+
+        fun bind(startIndex: Int) {
+            val unlockIndex = materiList.indexOfFirst { !it.isCompleted }
+
+            for (i in 0 until ITEMS_PER_ROW) {
+                val index = startIndex + i
+                val imageView = iconImageViews[i]
+
+                if (index < materiList.size) {
+                    val materiItem = materiList[index]
+                    val iconRes = when {
+                        materiItem.isCompleted -> R.drawable.ic_finished
+                        index == unlockIndex -> R.drawable.ic_unlock
+                        else -> R.drawable.ic_lock
+                    }
+                    imageView.setImageResource(iconRes)
+                    imageView.visibility = View.VISIBLE
+
+                    imageView.setOnClickListener {
+                        if (materiItem.isCompleted || index == unlockIndex) {
+                            val bundle = Bundle().apply {
+                                putInt("materiId", materiItem.id)
+                            }
+                            itemView.findNavController()
+                                .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
+                        }
+                    }
+
+                } else {
+                    // Hide if there are no more materi
+                    imageView.setImageResource(R.drawable.ic_unlock)
+                    imageView.visibility = View.VISIBLE
+                    imageView.setOnClickListener(null) // Prevent clicking
                 }
             }
         }
@@ -33,16 +70,18 @@ class MateriAdapter(private var materiList: List<MateriItem>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MateriViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_materi, parent, false)
-        return MateriViewHolder(itemView, this)
+        return MateriViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: MateriViewHolder, position: Int) {
-        val currentItem = materiList[position]
-        holder.iconImageView.setImageResource(currentItem.iconResourceId)
-
+        val startIndex = position * ITEMS_PER_ROW
+        holder.bind(startIndex)
     }
 
-    override fun getItemCount() = materiList.size
+    override fun getItemCount(): Int {
+        // Each row displays 8 items, so we need ceil(materiList.size / 8)
+        return (materiList.size + ITEMS_PER_ROW - 1) / ITEMS_PER_ROW
+    }
 
     fun setData(newList: List<MateriItem>) {
         materiList = newList
