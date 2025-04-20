@@ -28,6 +28,28 @@
             android:name="materiId"
             android:defaultValue="-1"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_stageFragment_to_soalFragment"
+            app:destination="@id/soalFragment">
+            <argument
+                android:name="materiId"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/soalFragment"
+        android:name="com.fhanafi.cerdikia.ui.question.SoalFragment"
+        android:label="SoalFragment"
+        tools:layout="@layout/fragment_soal">
+        <argument
+            android:name="materiId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_soalFragment_to_homeFragment"
+            app:destination="@id/navigation_home"
+            />
     </fragment>
     <fragment
         android:id="@+id/navigation_rangking"

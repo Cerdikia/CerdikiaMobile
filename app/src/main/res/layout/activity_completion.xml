@@ -11,7 +11,7 @@
         android:id="@+id/img_completion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="64dp"
         android:src="@drawable/img_completion"
         app:layout_constraintBottom_toTopOf="@+id/tv_completion"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,7 @@
 
     <ImageView
         android:id="@+id/img_placeholderXp"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:contentDescription="@string/cd_totalXp"
@@ -50,13 +50,14 @@
         android:layout_height="wrap_content"
         android:textColor="@color/goldYellow"
         android:textSize="24sp"
+        android:elevation="2dp"
         app:layout_constraintBottom_toBottomOf="@id/img_placeholderXp"
         app:layout_constraintEnd_toEndOf="@id/img_placeholderXp"
         app:layout_constraintHorizontal_bias="0.547"
         app:layout_constraintStart_toStartOf="@id/img_placeholderXp"
         app:layout_constraintTop_toTopOf="@id/img_placeholderXp"
         app:layout_constraintVertical_bias="0.684"
-        tools:text="10" />
+        tools:text="8 XP" />
 
     <Button
         android:id="@+id/btn_completion"
@@ -65,7 +66,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:background="@drawable/bg_button"
+        android:background="@drawable/bg_buttonblue"
         android:text="Lanjutkan"
         android:textAllCaps="false"
         android:textSize="14sp"

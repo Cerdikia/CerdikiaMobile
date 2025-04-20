@@ -10,6 +10,8 @@
 
     <color name="blueMain">#00A2EA</color>
     <color name="redMain">#FF4B4C</color>
+    <color name="blueFieldAnswer">#7FCFF3</color>
+    <color name="redFieldAnswer">#F4B0B2</color>
     <color name="blueBackground">#8000A2EA</color>
     <color name="redBackground">#F4B0B2</color>
     <color name="swipeSection">#2A7EA4</color>
@@ -17,4 +19,5 @@
     <color name="gray">#D9D9D9</color>
     <color name="highlightBlue">#8000A2EA</color>
     <color name="goldYellow">#FFC800</color>
+    <color name="textColorAnswer">#2D2727</color>
 </resources>

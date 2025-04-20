@@ -41,7 +41,14 @@ class StageFragment : Fragment() {
         viewModel.materiList.observe(viewLifecycleOwner, Observer { materiItems ->
             adapter.setData(materiItems) // If using ListAdapter
 //             If not using ListAdapter, you might have adapter.setData(materiItems)
-            // and then adapter.notifyDataSetChanged()
+
+            // Set data ke CardView atas dari item pertama
+            // kemungkinan berubah karena tidak ada stage per materi hanya ada
+            if (materiItems.isNotEmpty()) {
+                val firstItem = materiItems[0]
+                binding.textMateriTitle.text = firstItem.title
+                binding.textMateriDescription.text = firstItem.description
+            }
         })
 
         return root

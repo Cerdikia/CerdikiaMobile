@@ -1,6 +1,7 @@
 package com.fhanafi.cerdikia
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private val mainViewModel: MainViewModel by viewModels() // Gunakan viewModels() untuk mendapatkan ViewModel
+    private lateinit var composeBottomNavigationView: ComposeView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,5 +125,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    // Function to set the visibility of the bottom navigation bar in specific fragment
+    fun setBottomNavigationVisibility(isVisible: Boolean){
+        composeBottomNavigationView = binding.composeBottomNav
+        composeBottomNavigationView.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 }
