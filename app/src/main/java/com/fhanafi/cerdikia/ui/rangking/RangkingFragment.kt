@@ -55,6 +55,19 @@ class RangkingFragment : Fragment() {
     private fun observeUserData() {
         viewLifecycleOwner.lifecycleScope.launch {
             userViewModel.userData.collectLatest { user ->
+                // set badge and title based on xp
+                val (badgeResId, title) = when {
+                    user.xp >= 5000 -> R.drawable.ic_diamondrank to "Diamond League"
+                    user.xp >= 3000 -> R.drawable.ic_platinumrank to "Platinum League"
+                    user.xp >= 2000 -> R.drawable.ic_goldrangking to "Gold League"
+                    user.xp >= 1000 -> R.drawable.ic_silverrank to "Silver League"
+                    else -> R.drawable.ic_bronzerank to "Bronze League"
+                }
+
+                binding.imgRangking.setImageResource(badgeResId)
+                binding.tvRangkingTitle.text = title
+
+                // update rangking list maybe it change if there has API implementation
                 val currentList = rangkingViewModel.topPlayerRankingList.value ?: return@collectLatest
 
                 // Add current user to the list, re-sort by XP descending, then re-assign ranks

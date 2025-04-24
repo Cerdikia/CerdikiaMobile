@@ -18,7 +18,6 @@ class SoalFragment : Fragment() {
     companion object {
         fun newInstance() = SoalFragment()
     }
-
     private val viewModel: SoalViewModel by viewModels()
     private var _binding: FragmentSoalBinding? = null
     private val binding get() = _binding!!
@@ -41,7 +40,7 @@ class SoalFragment : Fragment() {
 
     private fun closeButton(){
         binding.btnClose.setOnClickListener {
-            findNavController().popBackStack(R.id.navigation_home, false)
+            findNavController().popBackStack(R.id.stageFragment, false)
         }
     }
 

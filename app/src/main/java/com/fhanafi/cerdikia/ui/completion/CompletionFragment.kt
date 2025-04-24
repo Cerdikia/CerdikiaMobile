@@ -38,8 +38,10 @@ class CompletionFragment : Fragment() {
                 userViewModel.addCompletedMateriId(materiId)
                 userViewModel.updateUserProgress(xp, gems, materiId)
             }
-
-            findNavController().popBackStack(R.id.stageFragment, false) // Back to StageFragment
+            findNavController().popBackStack()
+            findNavController().popBackStack()
+            findNavController().navigate(R.id.stageFragment)
+            // kudu mengpass materiId ke stageFragment agar bisa masuk ke stageFragment yang sesuai dengan materiId yang telah selesa
         }
     }
 
