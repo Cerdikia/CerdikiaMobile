@@ -68,4 +68,9 @@ class SoalViewModel : ViewModel() {
             _isQuizFinished.value = true
         }
     }
+
+    fun resetQuizFinished() {
+        _isQuizFinished.value = false
+    }
+
 }

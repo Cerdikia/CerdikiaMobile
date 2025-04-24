@@ -101,6 +101,7 @@ class SoalFragment : Fragment() {
                 }
 
                 findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
+                viewModel.resetQuizFinished()
             }
         }
     }

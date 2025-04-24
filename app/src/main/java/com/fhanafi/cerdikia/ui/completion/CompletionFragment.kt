@@ -33,12 +33,12 @@ class CompletionFragment : Fragment() {
 
         binding.tvXp.text = "$xp"
 
-        if (materiId != -1) {
-            userViewModel.addCompletedMateriId(materiId)
-            userViewModel.updateUserProgress(xp, gems, materiId)
-        }
-
         binding.btnCompletion.setOnClickListener {
+            if (materiId != -1) {
+                userViewModel.addCompletedMateriId(materiId)
+                userViewModel.updateUserProgress(xp, gems, materiId)
+            }
+
             findNavController().popBackStack(R.id.stageFragment, false) // Back to StageFragment
         }
     }

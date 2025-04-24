@@ -59,7 +59,7 @@ class MateriAdapter(private var materiList: List<MateriItem>) :
 
                 } else {
                     // Hide if there are no more materi
-                    imageView.setImageResource(R.drawable.ic_unlock)
+                    imageView.setImageResource(R.drawable.ic_lock)
                     imageView.visibility = View.VISIBLE
                     imageView.setOnClickListener(null) // Prevent clicking
                 }
