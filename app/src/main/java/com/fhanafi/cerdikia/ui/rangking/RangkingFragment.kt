@@ -5,80 +5,84 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.UserViewModel
+import com.fhanafi.cerdikia.UserViewModelFactory
+import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentRangkingBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-//TODO: fix the night mode which the fragment layout is still white even is already swicthed to night mode (Rangking & Shop Fragment)
 class RangkingFragment : Fragment() {
     private var _binding: FragmentRangkingBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
-    // Dummy data for Top 5 Player
-    private val TopPlayerRangkingList = listOf(
-        RankingItem(1, "Player 1", 5000),
-        RankingItem(2, "Player 2", 4009),
-        RankingItem(3, "Player 3", 4007),
-        RankingItem(4, "Player 4", 4004),
-        RankingItem(5, "Player 5", 4002)
-    )
-    // Dummy data for Your Ranking
-    private val PlayerRangkingList = listOf(
-        RankingItem(100, "Ini Saya", 500, isCurrentUser = true),
-        RankingItem(101, "Player 2", 409),
-        RankingItem(102, "Player 3", 407),
-        RankingItem(103, "Player 4", 404),
-        RankingItem(104, "Player 5", 402),
-        RankingItem(105, "Player 6", 401),
-    )
+    private val userViewModel: UserViewModel by activityViewModels {
+        UserViewModelFactory(UserPreference.getInstance(requireContext()))
+    }
+
+    private lateinit var rangkingViewModel: RangkingViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val rangkingViewModel =
-            ViewModelProvider(this).get(RangkingViewModel::class.java)
-
         _binding = FragmentRangkingBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        rangkingViewModel = ViewModelProvider(this)[RangkingViewModel::class.java]
 
-        //TODO: fix the top bar issue it still has delay effect which i want to create custom top bar using compose
-        // Hide the ActionBar
-//        (activity as? AppCompatActivity)?.supportActionBar?.hide()
-
-        // Setup RecyclerView for top rankings
-        binding.rvRangking.apply { // Use rvRangking (lowercase)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = RankingAdapter(TopPlayerRangkingList)
-        }
-
-        // Setup RecyclerView for your rankings
-        binding.rvYourRangking.apply { // Use rvYourRangking (lowercase)
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = RankingAdapter(PlayerRangkingList)
-        }
-
-        // Handle back button press
+        setupRecyclerView()
+        observeUserData()
         onBackButtonPressed()
 
-        return root
+        return binding.root
     }
 
-    /*override fun onStop() {
-        super.onStop()
-        (activity as? AppCompatActivity)?.supportActionBar?.show() // still buggy
-    }*/
+    private fun setupRecyclerView() {
+        binding.rvRangking.layoutManager = LinearLayoutManager(requireContext())
+
+        rangkingViewModel.topPlayerRankingList.observe(viewLifecycleOwner) { list ->
+            binding.rvRangking.adapter = RankingAdapter(list)
+        }
+    }
+
+    private fun observeUserData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            userViewModel.userData.collectLatest { user ->
+                // set badge and title based on xp
+                val (badgeResId, title) = when {
+                    user.xp >= 5000 -> R.drawable.ic_diamondrank to "Diamond League"
+                    user.xp >= 3000 -> R.drawable.ic_platinumrank to "Platinum League"
+                    user.xp >= 2000 -> R.drawable.ic_goldrangking to "Gold League"
+                    user.xp >= 1000 -> R.drawable.ic_silverrank to "Silver League"
+                    else -> R.drawable.ic_bronzerank to "Bronze League"
+                }
+
+                binding.imgRangking.setImageResource(badgeResId)
+                binding.tvRangkingTitle.text = title
+
+                // update rangking list maybe it change if there has API implementation
+                val currentList = rangkingViewModel.topPlayerRankingList.value ?: return@collectLatest
+
+                // Add current user to the list, re-sort by XP descending, then re-assign ranks
+                val dynamicList = (currentList.filterNot { it.isCurrentUser } + RankingItem(0, user.nama, user.xp, isCurrentUser = true))
+                    .sortedByDescending { it.xp }
+                    .mapIndexed { index, item -> item.copy(rank = index + 1) }
+
+                binding.rvRangking.adapter = RankingAdapter(dynamicList)
+            }
+        }
+    }
+
 
     private fun onBackButtonPressed() {
-        val callback = object : OnBackPressedCallback(true /* enabled by default */) {
+        val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 findNavController().navigate(R.id.navigation_home)
             }

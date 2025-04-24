@@ -6,9 +6,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.ActivityLoginBinding
 import com.fhanafi.cerdikia.databinding.ActivitySplashBinding
+import com.fhanafi.cerdikia.ui.login.AuthViewModel
+import com.fhanafi.cerdikia.ui.login.AuthViewModelFactory
 import com.fhanafi.cerdikia.ui.login.LoginActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,13 +22,16 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
+    private lateinit var viewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         initialBinding()
         supportActionBar?.hide()
-        setupSplashScreen()
+
+        viewModel = ViewModelProvider(this, AuthViewModelFactory(this))[AuthViewModel::class.java]
+        observeUserRegistration()
     }
 
     private fun initialBinding(){
@@ -32,18 +39,14 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    private fun setupSplashScreen() {
-        val splashDelay: Long = 3000 // 3 seconds
+    private fun observeUserRegistration() {
         CoroutineScope(Dispatchers.Main).launch {
-            delay(splashDelay)
-            startLoginActivity()
-            finish()
+            delay(3000)
+
+            viewModel.getNavigationTarget().collect { target ->
+                startActivity(Intent(this@SplashActivity, target))
+                finish()
+            }
         }
-    }
-
-    private fun startLoginActivity(){
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-
     }
 }

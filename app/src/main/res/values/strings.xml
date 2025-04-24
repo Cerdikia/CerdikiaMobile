@@ -12,4 +12,5 @@
     <string name="loading_description">Setiap detik adalah kesempatan belajar dan berkembang! Siap naik ke level berikutnya?</string>
     <string name="completion_title">Latihan Selesai!</string>
     <string name="cd_totalXp">Total XP Placeholder</string>
+    <string name="nama_kosong">Nama Tidak boleh Kosong</string>
 </resources>

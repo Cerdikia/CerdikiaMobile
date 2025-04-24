@@ -36,7 +36,6 @@ class MateriAdapter(private var materiList: List<MateriItem>) :
             for (i in 0 until ITEMS_PER_ROW) {
                 val index = startIndex + i
                 val imageView = iconImageViews[i]
-
                 if (index < materiList.size) {
                     val materiItem = materiList[index]
                     val iconRes = when {
@@ -59,9 +58,9 @@ class MateriAdapter(private var materiList: List<MateriItem>) :
 
                 } else {
                     // Hide if there are no more materi
-                    imageView.setImageResource(R.drawable.ic_unlock)
+                    imageView.setImageResource(R.drawable.ic_lock)
                     imageView.visibility = View.VISIBLE
-                    imageView.setOnClickListener(null) // Prevent clicking
+                    imageView.setOnClickListener(null)
                 }
             }
         }

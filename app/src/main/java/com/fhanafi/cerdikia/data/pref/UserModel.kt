@@ -5,10 +5,9 @@ data class UserModel(
 //    val token: String,
 //    val refreshToken: String,
 //    val isLogin: Boolean,
-//    val username: String,
-//    val password: String,
+    val nama: String,
+    val kelas: Int,
 //    val photoUrl: String? = null,
-//    val phone: String? = null,
     val xp: Int = 0,
     val gems: Int = 0,
     val completedMateriIds: Set<Int> = emptySet()

@@ -16,6 +16,8 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
     fun getUserData(): Flow<UserModel> {
         return dataStore.data.map { preferences ->
             UserModel(
+                nama = preferences[NAMA_KEY] ?: "",
+                kelas = preferences[KELAS_KEY] ?: 0,
                 xp = preferences[XP_KEY] ?: 0,
                 gems = preferences[GEMS_KEY] ?: 0,
                 completedMateriIds = preferences[COMPLETED_MATERI_KEY]?.split(",")?.mapNotNull {
@@ -34,8 +36,19 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
 
     suspend fun updateUserData(xp: Int, gems: Int, completedId: Int){
         dataStore.edit { preferences ->
-            preferences[XP_KEY] = xp
-            preferences[GEMS_KEY] = gems
+            val currentXp = preferences[XP_KEY] ?: 0
+            val currentGems = preferences[GEMS_KEY] ?: 0
+
+            preferences[XP_KEY] = currentXp + xp
+            preferences[GEMS_KEY] = currentGems + gems
+
+            val currentCompleted = preferences[COMPLETED_MATERI_KEY]
+                ?.split(",")
+                ?.mapNotNull { it.toIntOrNull() }
+                ?.toMutableSet() ?: mutableSetOf()
+
+            currentCompleted.add(completedId)
+            preferences[COMPLETED_MATERI_KEY] = currentCompleted.joinToString(",")
         }
     }
 
@@ -44,6 +57,18 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             val current = preferences[COMPLETED_MATERI_KEY]?.split(",")?.mapNotNull { it.toIntOrNull() }?.toMutableSet() ?: mutableSetOf()
             current.add(materiId)
             preferences[COMPLETED_MATERI_KEY] = current.joinToString(",")
+        }
+    }
+
+    suspend fun saveNama(nama: String) {
+        dataStore.edit { preferences ->
+            preferences[NAMA_KEY] = nama
+        }
+    }
+
+    suspend fun saveKelas(kelas: Int) {
+        dataStore.edit { preferences ->
+            preferences[KELAS_KEY] = kelas
         }
     }
 
@@ -56,7 +81,8 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
     companion object {
         @Volatile
         private var INSTANCE: UserPreference? = null
-
+        private val NAMA_KEY = stringPreferencesKey("nama")
+        private val KELAS_KEY = intPreferencesKey("kelas")
         private val XP_KEY = intPreferencesKey("xp")
         private val GEMS_KEY = intPreferencesKey("gems")
         private val COMPLETED_MATERI_KEY = stringPreferencesKey("completed_materi_ids")
