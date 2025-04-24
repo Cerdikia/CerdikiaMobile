@@ -43,13 +43,8 @@ class SplashActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             delay(3000)
 
-            viewModel.isUserRegistered().collect{ isRegistered ->
-                val intent = if(isRegistered){
-                    Intent(this@SplashActivity, MainActivity::class.java)
-                }else{
-                    Intent(this@SplashActivity, LoginActivity::class.java)
-                }
-                startActivity(intent)
+            viewModel.getNavigationTarget().collect { target ->
+                startActivity(Intent(this@SplashActivity, target))
                 finish()
             }
         }

@@ -26,11 +26,12 @@ class NamaActivity : AppCompatActivity() {
     private fun setupListener(){
         binding.btnNext.setOnClickListener {
             val nama = binding.etNama.text.toString()
-            if(nama.isNotEmpty()){
-                viewModel.saveNama(nama)
-                startActivity(Intent(this, KelasActivity::class.java))
-                finish()
-            }else{
+            if(nama.isNotEmpty()) {
+                viewModel.saveNama(nama) {
+                    startActivity(Intent(this, KelasActivity::class.java))
+                    finish()
+                }
+            } else {
                 binding.etNama.error = getString(R.string.nama_kosong)
             }
         }
