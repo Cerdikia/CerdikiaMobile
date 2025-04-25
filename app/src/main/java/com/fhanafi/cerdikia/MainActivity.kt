@@ -1,8 +1,6 @@
 package com.fhanafi.cerdikia
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,10 +20,10 @@ import com.fhanafi.cerdikia.ui.components.PlayerStatusBar
 import com.fhanafi.cerdikia.ui.components.theme.CerdikiaTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.navOptions
+import androidx.lifecycle.ViewModelProvider
+import com.fhanafi.cerdikia.data.pref.UserModel
+import com.fhanafi.cerdikia.data.pref.UserPreference
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private val mainViewModel: MainViewModel by viewModels() // Gunakan viewModels() untuk mendapatkan ViewModel
+    private lateinit var userViewModel: UserViewModel
     private lateinit var composeBottomNavigationView: ComposeView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +42,10 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         navController = navHostFragment.navController
+
+        val pref = UserPreference.getInstance(context = this)
+        val factory = UserViewModelFactory(pref)
+        userViewModel = ViewModelProvider(this, factory)[UserViewModel::class.java]
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -102,9 +105,8 @@ class MainActivity : AppCompatActivity() {
             val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(null)
             val currentDestination = navBackStackEntry?.destination
 
-            val currentFlag by mainViewModel.playerFlag.collectAsState() // Use mainViewModel
-            val currentGems by mainViewModel.playerGems.collectAsState() // Use mainViewModel
-            val currentEnergy by mainViewModel.playerEnergy.collectAsState() // Use mainViewModel
+            val userData by userViewModel.userData.collectAsState(initial = UserModel())
+
             // setting theme for choosing which fragment did have to use topbar in components.theme
             CerdikiaTheme {
                 val statusBarInsets = WindowInsets.statusBars.asPaddingValues()
@@ -115,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                             PlayerStatusBar(
                                 flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
                                 gemImageResourceId = R.drawable.ic_gems,
-                                gemCount = mainViewModel.playerGems, // Use mainViewModel
+                                gemCount = userData.gems, // Use mainViewModel
                                 energyImageResourceId = R.drawable.ic_lighting,
                                 energyCount = mainViewModel.playerEnergy // Use mainViewModel
                             )
