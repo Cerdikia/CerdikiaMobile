@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.databinding.FragmentCompletionBinding
@@ -33,15 +34,29 @@ class CompletionFragment : Fragment() {
 
         binding.tvXp.text = "$xp"
 
-        binding.btnCompletion.setOnClickListener {
-            if (materiId != -1) {
-                userViewModel.addCompletedMateriId(materiId)
-                userViewModel.updateUserProgress(xp, gems, materiId)
+        @Suppress("DEPRECATION")
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            userViewModel.userData.collect { user ->
+                val isAlreadyCompleted = user.completedMateriIds.contains(materiId)
+
+                binding.btnCompletion.setOnClickListener {
+                    if (materiId != -1) {
+                        // Always give XP
+                        userViewModel.updateUserProgress(xp = xp, gems = 0, completedId = materiId)
+
+                        if (!isAlreadyCompleted) {
+                            // Only give gems if not completed before
+                            userViewModel.addCompletedMateriId(materiId)
+                            userViewModel.updateUserProgress(xp = 0, gems = gems, completedId = materiId)
+                        }
+                    }
+
+                    findNavController().popBackStack()
+                    findNavController().popBackStack()
+                    findNavController().navigate(R.id.stageFragment)
+                }
+
             }
-            findNavController().popBackStack()
-            findNavController().popBackStack()
-            findNavController().navigate(R.id.stageFragment)
-            // kudu mengpass materiId ke stageFragment agar bisa masuk ke stageFragment yang sesuai dengan materiId yang telah selesa
         }
     }
 

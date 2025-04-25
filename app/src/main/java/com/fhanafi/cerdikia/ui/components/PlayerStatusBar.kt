@@ -1,14 +1,12 @@
 package com.fhanafi.cerdikia.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.TopAppBar
@@ -34,7 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun PlayerStatusBar(
     flagResourceId: StateFlow<Int>, // Use StateFlow for dynamic updates
     gemImageResourceId: Int,
-    gemCount: StateFlow<Int>, // Use StateFlow for dynamic updates
+    gemCount: Int, // Use StateFlow for dynamic updates
     energyImageResourceId: Int,
     energyCount: StateFlow<Int>, // Use StateFlow for dynamic updates
     bottomBorderColor: Color = Color(38, 137,181),
@@ -65,9 +63,9 @@ fun PlayerStatusBar(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    val currentGemCount by gemCount.collectAsState(initial = 0)
+//                    val currentGemCount by gemCount.collectAsState(initial = 0)
                     Text(
-                        text = currentGemCount.toString(),
+                        text = gemCount.toString(),
                         color = Color.White,
                         style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
                     )
