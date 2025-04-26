@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
             listOf(
                 BottomNavItem("Home", R.drawable.ic_homebotnav, R.id.navigation_home, selectedRoute == R.id.navigation_home),
                 BottomNavItem("Rangking", R.drawable.ic_rangkingbotnav, R.id.navigation_rangking, selectedRoute == R.id.navigation_rangking),
+                BottomNavItem("Profile", R.drawable.ic_profilebotnav, R.id.profileFragment, selectedRoute == R.id.profileFragment),
                 BottomNavItem("Shop", R.drawable.ic_shopbotnav, R.id.navigation_shop, selectedRoute == R.id.navigation_shop),
             )
         }
@@ -94,11 +95,12 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_home -> mainViewModel.updateSelectedRoute(R.id.navigation_home)
                 R.id.navigation_rangking -> mainViewModel.updateSelectedRoute(R.id.navigation_rangking)
+                R.id.profileFragment -> mainViewModel.updateSelectedRoute(R.id.profileFragment)
                 R.id.navigation_shop -> mainViewModel.updateSelectedRoute(R.id.navigation_shop)
             }
         }
     }
-
+    // TODO: i stil need to add energy for more element gamification but somehow it was creating more bug and i dont know why
     private fun setupTopBar() {
         val composeTopBar = findViewById<ComposeView>(R.id.compose_top_bar)
         composeTopBar.setContent {

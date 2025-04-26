@@ -63,7 +63,7 @@ fun PlayerStatusBar(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-//                    val currentGemCount by gemCount.collectAsState(initial = 0)
+//                    val currentGemCount by gemCount.collectAsState(initial = 0) // this little piece of shit maybe the problem because it was looking into MainViewModel which the user data was handle with UserViewModel that what my suspicion
                     Text(
                         text = gemCount.toString(),
                         color = Color.White,
@@ -81,7 +81,7 @@ fun PlayerStatusBar(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    val currentEnergyCount by energyCount.collectAsState(initial = 0)
+                    val currentEnergyCount by energyCount.collectAsState(initial = 0) // for the future me if i want to add energy element in top bar this line should be removed because it create more ambigu
                     Text(
                         text = currentEnergyCount.toString(),
                         color = Color.White,
