@@ -80,4 +80,9 @@
         android:name="com.fhanafi.cerdikia.ui.shop.ShopFragment"
         android:label="@string/title_shop"
         tools:layout="@layout/fragment_shop" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.fhanafi.cerdikia.ui.profile.profileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>

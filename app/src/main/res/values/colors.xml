@@ -20,4 +20,5 @@
     <color name="highlightBlue">#8000A2EA</color>
     <color name="goldYellow">#FFC800</color>
     <color name="textColorAnswer">#2D2727</color>
+    <color name="grayFieldButton">#EAEAEA</color>
 </resources>
