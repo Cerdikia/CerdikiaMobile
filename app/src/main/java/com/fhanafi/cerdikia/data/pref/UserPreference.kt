@@ -16,6 +16,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
     fun getUserData(): Flow<UserModel> {
         return dataStore.data.map { preferences ->
             UserModel(
+                email = preferences[EMAIL_KEY] ?: "",
                 nama = preferences[NAMA_KEY] ?: "",
                 kelas = preferences[KELAS_KEY] ?: 0,
                 xp = preferences[XP_KEY] ?: 0,
@@ -72,6 +73,12 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         }
     }
 
+    suspend fun saveEmail(email: String) {
+        dataStore.edit { preferences ->
+            preferences[EMAIL_KEY] = email
+        }
+    }
+
     suspend fun clearData() {
         dataStore.edit { preferences ->
             preferences.clear()
@@ -81,6 +88,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
     companion object {
         @Volatile
         private var INSTANCE: UserPreference? = null
+        private val EMAIL_KEY = stringPreferencesKey("email")
         private val NAMA_KEY = stringPreferencesKey("nama")
         private val KELAS_KEY = intPreferencesKey("kelas")
         private val XP_KEY = intPreferencesKey("xp")
