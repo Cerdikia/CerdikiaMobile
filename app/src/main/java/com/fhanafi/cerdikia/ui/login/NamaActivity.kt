@@ -12,6 +12,7 @@ class NamaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNamaBinding
     private lateinit var viewModel: AuthViewModel
+    private lateinit var email: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +20,9 @@ class NamaActivity : AppCompatActivity() {
         initialBinding()
         supportActionBar?.hide()
         viewModel = ViewModelProvider(this, AuthViewModelFactory(this))[AuthViewModel::class.java]
+        // Ambil email dari intent
+        email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
+        viewModel.setTempEmail(email)
 
         setupListener()
     }
@@ -27,10 +31,12 @@ class NamaActivity : AppCompatActivity() {
         binding.btnNext.setOnClickListener {
             val nama = binding.etNama.text.toString()
             if(nama.isNotEmpty()) {
-                viewModel.saveNama(nama) {
-                    startActivity(Intent(this, KelasActivity::class.java))
-                    finish()
-                }
+                viewModel.setTempNama(nama)
+                val intent = Intent(this, KelasActivity::class.java)
+                intent.putExtra("EXTRA_NAMA", nama)
+                intent.putExtra("EXTRA_EMAIL", email) // kirim email juga!
+                startActivity(intent)
+                finish()
             } else {
                 binding.etNama.error = getString(R.string.nama_kosong)
             }

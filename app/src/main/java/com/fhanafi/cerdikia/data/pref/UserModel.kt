@@ -1,7 +1,7 @@
 package com.fhanafi.cerdikia.data.pref
 
 data class UserModel(
-//    val email: String,
+    val email: String = "",
 //    val token: String,
 //    val refreshToken: String,
 //    val isLogin: Boolean,
