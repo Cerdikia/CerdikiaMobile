@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.remote.request.LoginRequest
 import com.fhanafi.cerdikia.data.remote.response.toUserModel
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
@@ -33,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var authViewModel: AuthViewModel
-    private lateinit var apiService: ApiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +43,7 @@ class LoginActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         // Init UserViewModel
-        authViewModel = ViewModelProvider(this, AuthViewModelFactory(this))[AuthViewModel::class.java]
-        // Init ApiService
-        apiService = ApiConfig.getApiService()
+         authViewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
 
         setupListener()
     }
@@ -123,23 +121,16 @@ class LoginActivity : AppCompatActivity() {
                 val email = currentUser.email ?: return@launch
 
                 try {
-                    val response = ApiConfig.getApiService().login(
-                        LoginRequest(
-                            email = email,
-                            role = "siswa" // default role
-                        )
-                    )
+                    val response = authViewModel.login(email)
 
                     // Simpan hasil login ke DataStore
                     response.data?.let { data ->
                         val userModel = data.toUserModel()
-                        authViewModel.saveNama(userModel.nama)
-                        authViewModel.saveEmail(userModel.email)
-                        authViewModel.saveKelas(userModel.kelas)
+                        authViewModel.saveUserData(userModel.nama, userModel.email, userModel.kelas)
                     }
 
+                    Log.d("LoginActivity", "Response: $response")
                     val userData = authViewModel.userData.first()
-
                     if (userData.nama.isEmpty()) {
                         // Kalau nama kosong berarti memang belum lengkap, lanjut ke NamaActivity
                         startActivity(Intent(this@LoginActivity, NamaActivity::class.java))
@@ -164,9 +155,14 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            updateUI(currentUser)
+        lifecycleScope.launch {
+            val userData = authViewModel.userData.first()
+            val currentUser = auth.currentUser
+
+            // Jangan auto-login kalau data user kosong
+            if (currentUser != null && userData.nama.isNotEmpty()) {
+                updateUI(currentUser)
+            }
         }
     }
 

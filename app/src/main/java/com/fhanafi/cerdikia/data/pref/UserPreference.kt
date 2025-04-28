@@ -95,9 +95,9 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         private val GEMS_KEY = intPreferencesKey("gems")
         private val COMPLETED_MATERI_KEY = stringPreferencesKey("completed_materi_ids")
 
-        fun getInstance(context: Context): UserPreference {
+        fun getInstance(dataStore: DataStore<Preferences>): UserPreference {
             return INSTANCE ?: synchronized(this) {
-                val instance = UserPreference(context.dataStore)
+                val instance = UserPreference(dataStore)
                 INSTANCE = instance
                 instance
             }

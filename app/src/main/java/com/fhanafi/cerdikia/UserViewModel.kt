@@ -1,36 +1,50 @@
 package com.fhanafi.cerdikia
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.UserModel
-import com.fhanafi.cerdikia.data.pref.UserPreference
+import com.fhanafi.cerdikia.data.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class UserViewModel(private val userPreference: UserPreference) : ViewModel() {
+class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
-    val userData: Flow<UserModel> = userPreference.getUserData()
+    val userData: Flow<UserModel> = userRepository.getUserData()
+
+    private val _isUpdating = MutableLiveData<Boolean>()
+    val isUpdating: LiveData<Boolean> = _isUpdating
+
+    fun updateUserProfile(nama: String, email: String, kelas: Int) {
+        viewModelScope.launch {
+            _isUpdating.value = true
+            try {
+                userRepository.updateUserProfile(nama, email, kelas)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isUpdating.value = false
+            }
+        }
+    }
 
     fun updateUserProgress(xp: Int, gems: Int, completedId: Int) {
         viewModelScope.launch {
-            userPreference.updateUserData(xp, gems, completedId)
+            userRepository.updateUserProgress(xp, gems, completedId)
         }
     }
 
     fun addCompletedMateriId(id: Int) {
         viewModelScope.launch {
-            userPreference.addCompletedMateri(id)
+            userRepository.addCompletedMateriId(id)
         }
     }
-}
 
-class UserViewModelFactory(private val pref: UserPreference) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return UserViewModel(pref) as T
+    fun clearData() {
+        viewModelScope.launch {
+            userRepository.clearData()
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

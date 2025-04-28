@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.UserViewModel
-import com.fhanafi.cerdikia.UserViewModelFactory
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
 
@@ -24,7 +24,7 @@ class StageFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: StageViewModel by viewModels()
     private val userViewModel: UserViewModel by activityViewModels {
-        UserViewModelFactory(UserPreference.getInstance(requireContext()))
+        ViewModelFactory.getInstance(requireContext())
     }
 
     private lateinit var adapter: MateriAdapter

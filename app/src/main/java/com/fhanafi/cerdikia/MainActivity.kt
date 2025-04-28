@@ -43,8 +43,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         navController = navHostFragment.navController
 
-        val pref = UserPreference.getInstance(context = this)
-        val factory = UserViewModelFactory(pref)
+        val factory = ViewModelFactory.getInstance(this)
         userViewModel = ViewModelProvider(this, factory)[UserViewModel::class.java]
 
         // Passing each menu ID as a set of Ids because each

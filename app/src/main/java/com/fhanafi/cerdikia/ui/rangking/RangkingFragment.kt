@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
-import com.fhanafi.cerdikia.UserViewModelFactory
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentRangkingBinding
 import kotlinx.coroutines.flow.collectLatest
@@ -24,7 +24,7 @@ class RangkingFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by activityViewModels {
-        UserViewModelFactory(UserPreference.getInstance(requireContext()))
+        ViewModelFactory.getInstance(requireContext())
     }
 
     private lateinit var rangkingViewModel: RangkingViewModel
