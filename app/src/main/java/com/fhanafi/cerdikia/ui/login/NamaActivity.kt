@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.ActivityNamaBinding
 
 class NamaActivity : AppCompatActivity() {
@@ -19,7 +20,7 @@ class NamaActivity : AppCompatActivity() {
         enableEdgeToEdge()
         initialBinding()
         supportActionBar?.hide()
-        viewModel = ViewModelProvider(this, AuthViewModelFactory(this))[AuthViewModel::class.java]
+        viewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
         // Ambil email dari intent
         email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
         viewModel.setTempEmail(email)

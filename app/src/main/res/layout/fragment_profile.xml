@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.profile.profileFragment">
+    tools:context=".ui.profile.ProfileFragment">
 
     <LinearLayout
         android:id="@+id/layout_tv"
@@ -134,22 +134,25 @@
         android:background="@drawable/rounded_edittext_background"
         android:padding="12dp"
         android:textSize="16sp"
-        android:inputType="textEmailAddress"
+        android:focusable="false"
+        android:clickable="false"
+        android:inputType="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/label_email" />
 
     <Button
-        android:id="@+id/buttonKeluar"
+        android:id="@+id/btn_keluar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="32dp"
-        android:padding="14dp"
+        android:padding="12dp"
         android:background="@drawable/button_keluar_background"
         android:text="Keluar"
+        android:textStyle="bold"
         android:textAllCaps="true"
         android:textColor="@color/blueMain"
         android:textSize="18sp"
@@ -158,5 +161,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextEmail" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

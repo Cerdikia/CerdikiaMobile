@@ -2,19 +2,14 @@ package com.fhanafi.cerdikia.ui.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
-import com.fhanafi.cerdikia.data.remote.request.RegisterRequest
-import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.ActivityKelasBinding
 import kotlinx.coroutines.launch
 
@@ -28,7 +23,7 @@ class KelasActivity : AppCompatActivity() {
         enableEdgeToEdge()
         initialBinding()
         supportActionBar?.hide()
-        viewModel = ViewModelProvider(this, AuthViewModelFactory(this))[AuthViewModel::class.java]
+        viewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
         // Baca dari Intent
         val nama = intent.getStringExtra("EXTRA_NAMA") ?: ""
         val email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
@@ -49,15 +44,13 @@ class KelasActivity : AppCompatActivity() {
                     try {
                         val nama = viewModel.getTempNama()
                         val email = viewModel.getTempEmail()
-                        Log.d("KelasActivity", "Clicked btnCreate: nama=${nama}, email=${email}, kelas=${kelas}")
 
                         if (nama == null || email == null) {
                             Toast.makeText(this@KelasActivity, "Nama atau Email kosong!", Toast.LENGTH_SHORT).show()
                             return@launch
                         }
 
-                        val apiService = ApiConfig.getApiService()
-                        val response = apiService.register(RegisterRequest(nama, email, kelas))
+                        val response = viewModel.register(nama, email, kelas)
 
                         if (response.message == "User dengan email $email berhasil dibuat") {
                             viewModel.saveUserAfterRegister() // Save to datastore after successful registration
