@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
@@ -58,7 +59,7 @@ class ProfileFragment : Fragment() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
-
+    // TODO: showing the profile picture from firebase
     private fun setupUI() {
         binding.tvSimpan.setOnClickListener {
             val nama = binding.editTextNama.text.toString().trim()
@@ -77,6 +78,7 @@ class ProfileFragment : Fragment() {
             }
 
             userViewModel.updateUserProfile(nama, email, kelas)
+            findNavController().navigate(R.id.navigation_home)
         }
 
         binding.btnKeluar.setOnClickListener {

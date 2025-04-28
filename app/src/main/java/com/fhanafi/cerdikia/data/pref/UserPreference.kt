@@ -23,7 +23,9 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
                 gems = preferences[GEMS_KEY] ?: 0,
                 completedMateriIds = preferences[COMPLETED_MATERI_KEY]?.split(",")?.mapNotNull {
                     it.toIntOrNull()
-                }?.toSet() ?: emptySet()
+                }?.toSet() ?: emptySet(),
+                accessToken = preferences[ACCESS_TOKEN_KEY] ?: "", // ➡️
+                refreshToken = preferences[REFRESH_TOKEN_KEY] ?: "",
             )
         }
     }
@@ -79,6 +81,24 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         }
     }
 
+    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        dataStore.edit { preferences ->
+            preferences[ACCESS_TOKEN_KEY] = accessToken
+            preferences[REFRESH_TOKEN_KEY] = refreshToken
+        }
+    }
+
+    suspend fun saveUser(user: UserModel) {
+        dataStore.edit { preferences ->
+            preferences[NAMA_KEY] = user.nama
+            preferences[EMAIL_KEY] = user.email
+            preferences[KELAS_KEY] = user.kelas
+            preferences[XP_KEY] = user.xp
+            preferences[GEMS_KEY] = user.gems
+            preferences[COMPLETED_MATERI_KEY] = user.completedMateriIds.joinToString(",")
+        }
+    }
+
     suspend fun clearData() {
         dataStore.edit { preferences ->
             preferences.clear()
@@ -94,6 +114,8 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         private val XP_KEY = intPreferencesKey("xp")
         private val GEMS_KEY = intPreferencesKey("gems")
         private val COMPLETED_MATERI_KEY = stringPreferencesKey("completed_materi_ids")
+        private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+        private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
 
         fun getInstance(dataStore: DataStore<Preferences>): UserPreference {
             return INSTANCE ?: synchronized(this) {

@@ -52,6 +52,10 @@ class AuthViewModel(
         repository.saveKelas(kelas)
     }
 
+    suspend fun saveUserTokens(accessToken: String, refreshToken: String) {
+        repository.saveTokens(accessToken, refreshToken)
+    }
+
     suspend fun getNavigationTarget(): Class<out AppCompatActivity> {
         val user = repository.getUserData().first() // ini baru bener, .first() ambil data sekali
         val isLoggedIn = FirebaseAuth.getInstance().currentUser != null
