@@ -9,6 +9,8 @@ fun Data.toUserModel(): UserModel {
         kelas = this.idKelas ?: 0,
         xp = 0, // default 0 saat login
         gems = 0, // default 0 saat login
-        completedMateriIds = emptySet() // default kosong saat login
+        completedMateriIds = emptySet(), // default kosong saat login
+        accessToken = this.accessToken ?: "",
+        refreshToken = this.refreshToken ?: ""
     )
 }

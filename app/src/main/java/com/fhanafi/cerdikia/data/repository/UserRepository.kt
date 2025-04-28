@@ -5,24 +5,36 @@ import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class UserRepository(private val apiService: ApiService, private val userPreference: UserPreference) {
 
-    suspend fun updateUserProfile(nama: String, email: String, kelas: Int) {
+    suspend fun updateProfileFromApi(nama: String, email: String, kelas: Int): UserModel {
         val request = UpdateProfileRequest(
             nama = nama,
             email = email,
             idKelas = kelas
         )
         val response = apiService.updateProfile(request)
-        if (response.message == "Update profile berhasil") {
-            // Save to DataStore
-            userPreference.saveNama(nama)
-            userPreference.saveEmail(email)
-            userPreference.saveKelas(kelas)
+
+        if (response.message.equals("Success", ignoreCase = true)) { // <<-- Ganti disini
+            val currentUser = getUserData().first() // Ambil data lama dari DataStore
+
+            return UserModel(
+                nama = response.data?.nama ?: currentUser.nama, // kalau null, pakai data lama
+                email = response.data?.email ?: currentUser.email,
+                kelas = response.data?.idKelas ?: currentUser.kelas,
+                xp = currentUser.xp,
+                gems = currentUser.gems,
+                completedMateriIds = currentUser.completedMateriIds
+            )
         } else {
             throw Exception("Update gagal: ${response.message}")
         }
+    }
+
+    suspend fun saveUserDataLocally(user: UserModel) {
+        userPreference.saveUser(user)
     }
 
     fun getUserData(): Flow<UserModel> {

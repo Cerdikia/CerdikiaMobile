@@ -17,7 +17,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
 
     private fun initRepositories(context: Context) {
         val pref = UserPreference.getInstance(context.dataStore)
-        val apiService = ApiConfig.getApiService()
+        val apiService = ApiConfig.getApiService(pref)
 
         if (!::userRepository.isInitialized) {
             userRepository = UserRepository.getInstance(apiService, pref)

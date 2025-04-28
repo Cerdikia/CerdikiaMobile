@@ -42,6 +42,10 @@ class AuthRepository private constructor(
         userPreference.clearData()
     }
 
+    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        userPreference.saveTokens(accessToken, refreshToken)
+    }
+
     companion object {
         @Volatile
         private var instance: AuthRepository? = null

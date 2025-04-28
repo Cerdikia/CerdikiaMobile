@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,9 +20,14 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     fun updateUserProfile(nama: String, email: String, kelas: Int) {
         viewModelScope.launch {
-            _isUpdating.value = true
+            _isUpdating.value = false
             try {
-                userRepository.updateUserProfile(nama, email, kelas)
+                // 1. Update dari server
+                val updatedUser = userRepository.updateProfileFromApi(nama, email, kelas)
+
+                // 2. Save ke DataStore
+                userRepository.saveUserDataLocally(updatedUser)
+                Log.d("UserViewModel", "User data updated: $updatedUser")
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {

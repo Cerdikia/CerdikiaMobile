@@ -127,10 +127,12 @@ class LoginActivity : AppCompatActivity() {
                     response.data?.let { data ->
                         val userModel = data.toUserModel()
                         authViewModel.saveUserData(userModel.nama, userModel.email, userModel.kelas)
+                        authViewModel.saveUserTokens(userModel.accessToken, userModel.refreshToken)
                     }
 
                     Log.d("LoginActivity", "Response: $response")
                     val userData = authViewModel.userData.first()
+                    Log.d("LoginActivity", "User Data: $userData")
                     if (userData.nama.isEmpty()) {
                         // Kalau nama kosong berarti memang belum lengkap, lanjut ke NamaActivity
                         startActivity(Intent(this@LoginActivity, NamaActivity::class.java))
