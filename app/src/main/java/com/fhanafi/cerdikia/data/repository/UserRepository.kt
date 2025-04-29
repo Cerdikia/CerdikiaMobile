@@ -37,6 +37,27 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
         userPreference.saveUser(user)
     }
 
+    suspend fun fetchPointAndSave() {
+        val response = apiService.getPoint()
+
+        if (response.message.equals("Data retrieved successfully", ignoreCase = true)) {
+            val currentUser = getUserData().first()
+
+            val newUser = UserModel(
+                nama = currentUser.nama,
+                email = currentUser.email,
+                kelas = currentUser.kelas,
+                xp = response.data?.exp ?: currentUser.xp, // Update dari API
+                gems = response.data?.diamond ?: currentUser.gems, // Update dari API
+                completedMateriIds = currentUser.completedMateriIds
+            )
+
+            userPreference.saveUser(newUser)
+        } else {
+            throw Exception("Fetch point failed: ${response.message}")
+        }
+    }
+
     fun getUserData(): Flow<UserModel> {
         return userPreference.getUserData()
     }
@@ -47,10 +68,6 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun addCompletedMateriId(id: Int) {
         userPreference.addCompletedMateri(id)
-    }
-
-    suspend fun clearData(){
-        userPreference.clearData()
     }
 
     companion object {

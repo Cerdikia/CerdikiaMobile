@@ -23,7 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import com.fhanafi.cerdikia.data.pref.UserModel
-import com.fhanafi.cerdikia.data.pref.UserPreference
+import com.fhanafi.cerdikia.ui.components.ShimmerTopBar
+import kotlinx.coroutines.delay
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,19 +47,10 @@ class MainActivity : AppCompatActivity() {
         val factory = ViewModelFactory.getInstance(this)
         userViewModel = ViewModelProvider(this, factory)[UserViewModel::class.java]
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_rangking, R.id.navigation_shop
-            )
-        )
-//        setupActionBarWithNavController(navController, appBarConfiguration)
         setupBottomNavigationBar()
         setupTopBar()
         destinationListener()
     }
-
     private fun setupBottomNavigationBar() {
         binding.composeBottomNav.setContent {
             CerdikiaTheme {
@@ -107,6 +99,14 @@ class MainActivity : AppCompatActivity() {
             val currentDestination = navBackStackEntry?.destination
 
             val userData by userViewModel.userData.collectAsState(initial = UserModel())
+            var isLoading by remember { mutableStateOf(true) }
+
+            LaunchedEffect(Unit) {
+                isLoading = true
+                userViewModel.refreshPointData()
+                delay(800)
+                isLoading = false
+            }
 
             // setting theme for choosing which fragment did have to use topbar in components.theme
             CerdikiaTheme {
@@ -115,13 +115,17 @@ class MainActivity : AppCompatActivity() {
                     when (currentDestination?.id) {
                         //Adding the id in here for showing the topbar in the specific Fragment
                         R.id.navigation_home, R.id.navigation_shop, R.id.stageFragment -> {
-                            PlayerStatusBar(
-                                flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
-                                gemImageResourceId = R.drawable.ic_gems,
-                                gemCount = userData.gems, // Use mainViewModel
-                                energyImageResourceId = R.drawable.ic_lighting,
-                                energyCount = mainViewModel.playerEnergy // Use mainViewModel
-                            )
+                            if (isLoading) {
+                                ShimmerTopBar()
+                            } else {
+                                PlayerStatusBar(
+                                    flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
+                                    gemImageResourceId = R.drawable.ic_gems,
+                                    gemCount = userData.gems, // Use mainViewModel
+                                    energyImageResourceId = R.drawable.ic_lighting,
+                                    energyCount = mainViewModel.playerEnergy // Use mainViewModel
+                                )
+                            }
                         }
                         else -> {
                             Spacer(modifier = Modifier.height(0.dp))
