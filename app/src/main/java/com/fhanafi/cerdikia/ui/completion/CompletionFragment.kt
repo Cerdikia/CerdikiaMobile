@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.databinding.FragmentCompletionBinding
 import com.fhanafi.cerdikia.R
+import kotlinx.coroutines.launch
 
 class CompletionFragment : Fragment() {
 
@@ -41,21 +42,29 @@ class CompletionFragment : Fragment() {
 
                 binding.btnCompletion.setOnClickListener {
                     if (materiId != -1) {
-                        // Always give XP
-                        userViewModel.updateUserProgress(xp = xp, gems = 0, completedId = materiId)
-
                         if (!isAlreadyCompleted) {
-                            // Only give gems if not completed before
                             userViewModel.addCompletedMateriId(materiId)
                             userViewModel.updateUserProgress(xp = 0, gems = gems, completedId = materiId)
                         }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            // 1. Update via API (incrementing)
+                            userViewModel.updatePointAndRefresh(
+                                xp = xp,
+                                gems = if (isAlreadyCompleted) 0 else gems
+                            )
+
+                            // 2. Wait until GET (refresh) completes
+                            val job = launch { userViewModel.refreshPointData() }
+                            job.join() // Ensure it's completed before navigating
+
+                            // 3. Navigate
+                            findNavController().popBackStack()
+                            findNavController().popBackStack()
+                            findNavController().navigate(R.id.stageFragment)
+                        }
                     }
-
-                    findNavController().popBackStack()
-                    findNavController().popBackStack()
-                    findNavController().navigate(R.id.stageFragment)
                 }
-
             }
         }
     }

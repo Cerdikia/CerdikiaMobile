@@ -36,6 +36,16 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun updatePointAndRefresh(xp: Int, gems: Int) {
+        viewModelScope.launch {
+            try {
+                userRepository.updatePointAndRefresh(xp, gems)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun refreshPointData() {
         viewModelScope.launch {
             try {

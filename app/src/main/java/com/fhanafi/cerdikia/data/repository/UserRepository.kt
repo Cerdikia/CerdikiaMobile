@@ -2,12 +2,41 @@ package com.fhanafi.cerdikia.data.repository
 
 import com.fhanafi.cerdikia.data.pref.UserModel
 import com.fhanafi.cerdikia.data.pref.UserPreference
+import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
 class UserRepository(private val apiService: ApiService, private val userPreference: UserPreference) {
+
+    suspend fun updatePointAndRefresh(xp: Int, gems: Int) {
+        val currentUser = userPreference.getUserData().first()
+        val currentXp = currentUser.xp
+        val currentGems = currentUser.gems
+
+        val updatedXp = currentXp + xp
+        val updatedGems = currentGems + gems
+
+        val request = UpdatePointRequest(
+            exp = updatedXp,
+            diamond = updatedGems,
+            email = currentUser.email
+        )
+
+        val response = apiService.updatePoint(request)
+
+        val updated = response.data
+        if (updated != null) {
+            // Save the updated XP and Gems to DataStore
+            userPreference.updateGemsAndXP(
+                gems = updated.diamond ?: updatedGems,
+                xp = updated.exp ?: updatedXp
+            )
+        } else {
+            throw Exception("UpdatePointResponse ${response.message}")
+        }
+    }
 
     suspend fun updateProfileFromApi(nama: String, email: String, kelas: Int): UserModel {
         val request = UpdateProfileRequest(
