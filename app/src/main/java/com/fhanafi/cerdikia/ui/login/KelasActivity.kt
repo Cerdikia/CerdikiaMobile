@@ -2,6 +2,7 @@ package com.fhanafi.cerdikia.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -10,13 +11,17 @@ import androidx.lifecycle.lifecycleScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.ViewModelFactory
+import com.fhanafi.cerdikia.data.remote.response.toUserModel
 import com.fhanafi.cerdikia.databinding.ActivityKelasBinding
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 
 class KelasActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityKelasBinding
     private lateinit var viewModel: AuthViewModel
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +58,21 @@ class KelasActivity : AppCompatActivity() {
                         val response = viewModel.register(nama, email, kelas)
 
                         if (response.message == "User dengan email $email berhasil dibuat") {
-                            viewModel.saveUserAfterRegister() // Save to datastore after successful registration
-                            startActivity(Intent(this@KelasActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            Toast.makeText(this@KelasActivity, "Gagal register: ${response.message}", Toast.LENGTH_SHORT).show()
+                            val loginResponse = viewModel.login(email)
+                            val user: FirebaseUser? = auth.currentUser
+                            user?.photoUrl?.toString()?.let { photoUrl ->
+                                viewModel.savePhotoUrl(photoUrl)
+                            }
+                            loginResponse.data?.let { data ->
+                                val userModel = data.toUserModel()
+                                viewModel.saveUserData(userModel.nama, userModel.email, userModel.kelas)
+                                viewModel.saveUserTokens(userModel.accessToken, userModel.refreshToken)
+                                Log.d("KelasActivity", "User data saved: $userModel")
+                                startActivity(Intent(this@KelasActivity, MainActivity::class.java))
+                                finish()
+                            } ?: run {
+                                Toast.makeText(this@KelasActivity, "Login otomatis gagal setelah registrasi.", Toast.LENGTH_SHORT).show()
+                            }
                         }
 
                     } catch (e: Exception) {

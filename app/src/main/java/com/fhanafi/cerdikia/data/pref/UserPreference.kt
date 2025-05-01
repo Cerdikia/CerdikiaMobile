@@ -19,6 +19,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
                 email = preferences[EMAIL_KEY] ?: "",
                 nama = preferences[NAMA_KEY] ?: "",
                 kelas = preferences[KELAS_KEY] ?: 0,
+                photoUrl = preferences[PHOTO_URL_KEY] ?: "",
                 xp = preferences[XP_KEY] ?: 0,
                 gems = preferences[GEMS_KEY] ?: 0,
                 completedMateriIds = preferences[COMPLETED_MATERI_KEY]?.split(",")?.mapNotNull {
@@ -88,6 +89,12 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         }
     }
 
+    suspend fun savePhotoUrl(photoUrl: String) {
+        dataStore.edit { preferences ->
+            preferences[PHOTO_URL_KEY] = photoUrl
+        }
+    }
+
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = accessToken
@@ -118,6 +125,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val NAMA_KEY = stringPreferencesKey("nama")
         private val KELAS_KEY = intPreferencesKey("kelas")
+        private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val XP_KEY = intPreferencesKey("xp")
         private val GEMS_KEY = intPreferencesKey("gems")
         private val COMPLETED_MATERI_KEY = stringPreferencesKey("completed_materi_ids")

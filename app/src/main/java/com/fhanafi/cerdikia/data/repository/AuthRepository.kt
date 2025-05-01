@@ -38,6 +38,10 @@ class AuthRepository private constructor(
         userPreference.saveEmail(email)
     }
 
+    suspend fun savePhotoUrl(photoUrl: String) {
+        userPreference.savePhotoUrl(photoUrl)
+    }
+
     suspend fun clearData(){
         userPreference.clearData()
     }
