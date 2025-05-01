@@ -1,12 +1,14 @@
 package com.fhanafi.cerdikia.ui.rangking
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,8 +28,9 @@ class RangkingFragment : Fragment() {
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
-
-    private lateinit var rangkingViewModel: RangkingViewModel
+    private val rangkingViewModel: RangkingViewModel by viewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,11 +38,11 @@ class RangkingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRangkingBinding.inflate(inflater, container, false)
-        rangkingViewModel = ViewModelProvider(this)[RangkingViewModel::class.java]
 
         setupRecyclerView()
         observeUserData()
         onBackButtonPressed()
+        rangkingViewModel.fetchRankingForUser() // <- Refetch when fragment is opened
 
         return binding.root
     }
@@ -47,8 +50,10 @@ class RangkingFragment : Fragment() {
     private fun setupRecyclerView() {
         binding.rvRangking.layoutManager = LinearLayoutManager(requireContext())
 
-        rangkingViewModel.topPlayerRankingList.observe(viewLifecycleOwner) { list ->
-            binding.rvRangking.adapter = RankingAdapter(list)
+        viewLifecycleOwner.lifecycleScope.launch {
+            rangkingViewModel.topPlayerRankingList.collectLatest { list ->
+                binding.rvRangking.adapter = RankingAdapter(list)
+            }
         }
     }
 
@@ -69,12 +74,12 @@ class RangkingFragment : Fragment() {
 
                 // update rangking list maybe it change if there has API implementation
                 val currentList = rangkingViewModel.topPlayerRankingList.value ?: return@collectLatest
-
+                Log.d("RankingPhoto", "Before insert: user photoUrl = ${user.photoUrl}")
                 // Add current user to the list, re-sort by XP descending, then re-assign ranks
-                val dynamicList = (currentList.filterNot { it.isCurrentUser } + RankingItem(0, user.nama, user.xp, isCurrentUser = true))
+                val dynamicList = (currentList.filterNot { it.isCurrentUser } + RankingItem(0, user.nama, user.xp, isCurrentUser = true, photoUrl = user.photoUrl))
                     .sortedByDescending { it.xp }
-                    .mapIndexed { index, item -> item.copy(rank = index + 1) }
-
+                    .mapIndexed { index, item -> item.copy(rank = index + 1, photoUrl = item.photoUrl, isCurrentUser = item.isCurrentUser) }
+                Log.d("RankingPhoto", "User photoUrl: ${user.photoUrl}")
                 binding.rvRangking.adapter = RankingAdapter(dynamicList)
             }
         }

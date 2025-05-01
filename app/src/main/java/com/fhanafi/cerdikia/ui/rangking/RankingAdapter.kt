@@ -1,9 +1,11 @@
 package com.fhanafi.cerdikia.ui.rangking
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.ItemRangkingBinding
 
@@ -21,7 +23,13 @@ class RankingAdapter(private val rankingList: List<RankingItem>) :
             rankTextView.text = item.rank.toString()
             playerNameTextView.text = item.playerName
             xpTextView.text = "${item.xp} XP"
-
+            Log.d("RankingPhoto", "Player photoUrl: ${item.photoUrl}")
+            Glide.with(itemView.context)
+                .load(item.photoUrl)
+                .placeholder(R.drawable.player_holder)
+                .error(R.drawable.player_holder) // Optional: show a default image
+                .circleCrop()
+                .into(profilePlaceholderView)
             if(item.isCurrentUser){
                 rootLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.highlightBlue))
             }else{
