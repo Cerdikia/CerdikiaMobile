@@ -36,6 +36,26 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun updatePointAndRefresh(xp: Int, gems: Int) {
+        viewModelScope.launch {
+            try {
+                userRepository.updatePointAndRefresh(xp, gems)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun refreshPointData() {
+        viewModelScope.launch {
+            try {
+                userRepository.fetchPointAndSave()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun updateUserProgress(xp: Int, gems: Int, completedId: Int) {
         viewModelScope.launch {
             userRepository.updateUserProgress(xp, gems, completedId)
@@ -48,9 +68,4 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    fun clearData() {
-        viewModelScope.launch {
-            userRepository.clearData()
-        }
-    }
 }
