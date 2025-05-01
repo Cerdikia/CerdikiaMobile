@@ -15,7 +15,6 @@ import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentProfileBinding
 import com.fhanafi.cerdikia.helper.SessionManager
-import com.fhanafi.cerdikia.ui.login.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -28,9 +27,6 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by viewModels {
-        ViewModelFactory.getInstance(requireContext())
-    }
-    private val authViewModel: AuthViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
     }
 
