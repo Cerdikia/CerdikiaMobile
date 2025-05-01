@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.data.pref.UserModel
+import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
@@ -50,6 +51,12 @@ class AuthViewModel(
         repository.saveNama(nama)
         repository.saveEmail(email)
         repository.saveKelas(kelas)
+    }
+
+    fun savePhotoUrl(photoUrl: String) {
+        viewModelScope.launch {
+            repository.savePhotoUrl(photoUrl)
+        }
     }
 
     suspend fun saveUserTokens(accessToken: String, refreshToken: String) {

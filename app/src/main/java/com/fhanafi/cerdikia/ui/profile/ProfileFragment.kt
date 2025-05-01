@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia.ui.profile
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,11 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentProfileBinding
 import com.fhanafi.cerdikia.helper.SessionManager
+import com.fhanafi.cerdikia.ui.splashscreen.SplashActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -91,7 +94,9 @@ class ProfileFragment : Fragment() {
             Toast.makeText(requireContext(), "Anda berhasil keluar!", Toast.LENGTH_SHORT).show()
 
             requireActivity().finishAffinity()
-            exitProcess(0)
+            val intent = Intent(requireContext(), SplashActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
     }
 
@@ -114,6 +119,13 @@ class ProfileFragment : Fragment() {
                 binding.editTextNama.setText(user.nama)
                 binding.editTextEmail.setText(user.email)
                 binding.editTextKelas.setText(user.kelas.toString())
+
+                Glide.with(this@ProfileFragment)
+                    .load(user.photoUrl)
+                    .placeholder(R.drawable.player_holder)
+                    .error(R.drawable.player_holder)
+                    .circleCrop()
+                    .into(binding.viewProfilePlaceholder)
             }
         }
     }

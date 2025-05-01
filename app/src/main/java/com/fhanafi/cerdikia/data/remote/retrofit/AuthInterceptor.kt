@@ -16,10 +16,17 @@ class AuthInterceptor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val url = originalRequest.url.toString()
+
+        // Skip adding Authorization header for login and register endpoints
+        if (url.contains("/login") || url.contains("/register/siswa")) {
+            return chain.proceed(originalRequest)
+        }
+
         val user = runBlocking { userPreference.getUserData().first() }
         val accessToken = user.accessToken
         Log.d("AuthInterceptor", "Using access token: $accessToken")
-        val originalRequest = chain.request()
         val authenticatedRequest = originalRequest.newBuilder()
             .addHeader("Authorization", "Bearer $accessToken")
             .build()
