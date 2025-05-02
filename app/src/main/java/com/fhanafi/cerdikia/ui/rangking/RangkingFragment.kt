@@ -47,19 +47,51 @@ class RangkingFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        badgeVisibiliy()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun badgeVisibiliy(){
+        binding.imgRangking.visibility = View.GONE
+        binding.tvRangkingTitle.visibility = View.GONE
+        binding.tvRangkingDescription.visibility = View.GONE
+        binding.tvRangkingDay.visibility = View.GONE
+    }
+
     private fun setupRecyclerView() {
         binding.rvRangking.layoutManager = LinearLayoutManager(requireContext())
 
         viewLifecycleOwner.lifecycleScope.launch {
-            rangkingViewModel.topPlayerRankingList.collectLatest { list ->
-                binding.rvRangking.adapter = RankingAdapter(list)
+            rangkingViewModel.isLoading.collectLatest { loading ->
+                if (loading) {
+                    binding.rvRangking.adapter = ShimmerAdapter()
+                } else {
+                    rangkingViewModel.topPlayerRankingList.collectLatest { list ->
+                        binding.rvRangking.adapter = RankingAdapter(list)
+                    }
+                }
             }
         }
     }
 
     private fun observeUserData() {
         viewLifecycleOwner.lifecycleScope.launch {
+            // Show shimmer while waiting
+            binding.shimmerRankingHeader.visibility = View.VISIBLE
+            binding.shimmerRankingHeader.startShimmer()
+
             userViewModel.userData.collectLatest { user ->
+                // Hide shimmer when data is ready
+                binding.shimmerRankingHeader.stopShimmer()
+                binding.shimmerRankingHeader.visibility = View.GONE
+
+                // Now show the real views
+                binding.imgRangking.visibility = View.VISIBLE
+                binding.tvRangkingTitle.visibility = View.VISIBLE
+                binding.tvRangkingDescription.visibility = View.VISIBLE
+                binding.tvRangkingDay.visibility = View.VISIBLE
+
                 // set badge and title based on xp
                 val (badgeResId, title) = when {
                     user.xp >= 5000 -> R.drawable.ic_diamondrank to "Diamond League"

@@ -21,8 +21,12 @@ class RangkingViewModel(
     val topPlayerRankingList: StateFlow<List<RankingItem>> = _topPlayerRankingList
     val userData: Flow<UserModel> = repository.getUserData()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun fetchRankingForUser() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val user = repository.getUserData().first() // only take the current user once
                 val kelasId = user.kelas
@@ -43,6 +47,7 @@ class RangkingViewModel(
                         photoUrl = playerPhoto
                     )
                 }
+                _isLoading.value = false
             } catch (e: Exception) {
                 Log.e("RangkingViewModel", "Error fetching ranking: ${e.message}")
             }
