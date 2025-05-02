@@ -1,25 +1,56 @@
 package com.fhanafi.cerdikia.ui.rangking
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fhanafi.cerdikia.data.pref.UserModel
+import com.fhanafi.cerdikia.data.repository.RangkingRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class RangkingViewModel : ViewModel() {
+class RangkingViewModel(
+    private val repository: RangkingRepository,
+) : ViewModel() {
 
-    private val _topPlayerRankingList = MutableLiveData<List<RankingItem>>(
-        listOf(
-            RankingItem(1, "Player 1", 5000),
-            RankingItem(2, "Player 2", 4009),
-            RankingItem(3, "Player 3", 4007),
-            RankingItem(4, "Player 4", 4004),
-            RankingItem(5, "Player 5", 4002),
-            RankingItem(6, "Player 6", 4001),
-            RankingItem(7, "Player 7", 4000),
-            RankingItem(8, "Player 8", 3999),
-            RankingItem(9, "Player 9", 3998),
-            RankingItem(10, "Player 10", 3997),
-        )
-    )
+    private val _topPlayerRankingList = MutableStateFlow<List<RankingItem>>(emptyList())
+    val topPlayerRankingList: StateFlow<List<RankingItem>> = _topPlayerRankingList
+    val userData: Flow<UserModel> = repository.getUserData()
 
-    val topPlayerRankingList: LiveData<List<RankingItem>> get() = _topPlayerRankingList
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun fetchRankingForUser() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val user = repository.getUserData().first() // only take the current user once
+                val kelasId = user.kelas
+                val data = repository.fetchRanking(kelasId)
+                Log.d("RankingPhoto", "Before insert: user photoUrl = ${user.photoUrl}")
+
+                _topPlayerRankingList.value = data.map {
+                    val isCurrentUser = it.nama == user.nama
+                    val playerPhoto = if (isCurrentUser) user.photoUrl else null
+                    Log.d("RankingPhoto", "Player photoUrl: $playerPhoto")
+                    /* it still using photoUrl from data store to show only the current user photo.
+                     If i want to show all photo user in rangking the backend was need to update so it can upload the photo or atleast has response that photo url included */
+                    RankingItem(
+                        rank = it.ranking ?: 0,
+                        playerName = it.nama ?: "-",
+                        xp = it.exp ?: 0,
+                        isCurrentUser = isCurrentUser,
+                        photoUrl = playerPhoto
+                    )
+                }
+                _isLoading.value = false
+            } catch (e: Exception) {
+                Log.e("RangkingViewModel", "Error fetching ranking: ${e.message}")
+            }
+        }
+    }
 }

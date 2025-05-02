@@ -7,6 +7,7 @@ import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
 import com.fhanafi.cerdikia.data.remote.response.GetPointResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
+import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
 import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
 import com.fhanafi.cerdikia.data.remote.response.TokenResponse
 import com.fhanafi.cerdikia.data.remote.response.UpdatePointResponse
@@ -16,6 +17,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("login")
@@ -47,4 +49,9 @@ interface ApiService {
     suspend fun refreshToken(
         @Body tokenRequest: TokenRequest
     ): Response<TokenResponse>
+
+    @GET("ranking ")
+    suspend fun getRangking(
+        @Query("id_kelas") idKelas: Int
+    ): RangkingResponse
 }

@@ -20,7 +20,7 @@ class AuthInterceptor(
         val url = originalRequest.url.toString()
 
         // Skip adding Authorization header for login and register endpoints
-        if (url.contains("/login") || url.contains("/register/siswa")) {
+        if (url.contains("/login") || url.contains("/register/siswa") || url.contains("/ranking?id_kelas=0")) {
             return chain.proceed(originalRequest)
         }
 

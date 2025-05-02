@@ -4,5 +4,6 @@ data class RankingItem (
     val rank: Int,
     val playerName: String,
     val xp: Int,
-    val isCurrentUser: Boolean = false
+    val isCurrentUser: Boolean = false,
+    val photoUrl: String? = null
 )
