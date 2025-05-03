@@ -21,4 +21,5 @@
     <color name="goldYellow">#FFC800</color>
     <color name="textColorAnswer">#2D2727</color>
     <color name="grayFieldButton">#EAEAEA</color>
+    <color name="popupBorder">#4898BC</color>
 </resources>
