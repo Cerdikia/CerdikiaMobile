@@ -60,6 +60,13 @@
         android:textSize="14sp"
         />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_ranking_badge_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="190dp" />
+
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_ranking_header"
         android:layout_width="match_parent"
@@ -113,7 +120,8 @@
         android:background="?android:attr/listDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_rangking_day"/>
+        app:layout_constraintTop_toTopOf="@id/guideline_ranking_badge_bottom"
+        />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -128,32 +136,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
-
-    <!--<TextView
-        android:id="@+id/tv_your_rangking"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Peringkat Kamu"
-        android:layout_marginTop="8dp"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rv_rangking"
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_your_rangking"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/tv_your_rangking"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />-->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
