@@ -9,13 +9,15 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.data.database.MapelEntity
+import com.fhanafi.cerdikia.helper.MapelDescriptionHelper
 
 
-class HomeAdapter(private val itemList: List<HomePlaceHolderItem>) :
+class HomeAdapter(private val itemList: List<MapelEntity>) :
     RecyclerView.Adapter<HomeAdapter.ViewHolder>(){
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val titleTextView: TextView = itemView.findViewById(R.id.text_title)
-            val progressTextView: TextView = itemView.findViewById(R.id.text_progress)
+            val kelasTextView: TextView = itemView.findViewById(R.id.text_kelas)
             val descriptionTextView: TextView = itemView.findViewById(R.id.text_description)
             val mulaiButton: Button = itemView.findViewById(R.id.button_mulai)
         }
@@ -28,9 +30,9 @@ class HomeAdapter(private val itemList: List<HomePlaceHolderItem>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = itemList[position]
-        holder.titleTextView.text = currentItem.title
-        holder.progressTextView.text = currentItem.progress
-        holder.descriptionTextView.text = currentItem.description
+        holder.titleTextView.text = currentItem.nama_mapel
+        holder.kelasTextView.text = "Kelas : ${currentItem.kelas}"
+        holder.descriptionTextView.text = MapelDescriptionHelper.getDescription(currentItem.nama_mapel)
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
             val materiId = position + 1 // Example: Use the position as a simple ID. You might need a more specific ID from your data.

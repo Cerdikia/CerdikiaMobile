@@ -5,6 +5,7 @@ import com.fhanafi.cerdikia.data.remote.request.RegisterRequest
 import com.fhanafi.cerdikia.data.remote.request.TokenRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
+import com.fhanafi.cerdikia.data.remote.response.GetMapelResponse
 import com.fhanafi.cerdikia.data.remote.response.GetPointResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
@@ -50,8 +51,14 @@ interface ApiService {
         @Body tokenRequest: TokenRequest
     ): Response<TokenResponse>
 
-    @GET("ranking ")
+    @GET("ranking")
     suspend fun getRangking(
         @Query("id_kelas") idKelas: Int
     ): RangkingResponse
+
+    @GET("genericMapels")
+    suspend fun getMapel(
+        @Query("id_kelas") idKelas: Int,
+        @Query("finished") idMapel: Boolean
+    ): GetMapelResponse
 }
