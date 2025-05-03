@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.data.database.MapelEntity
+import com.fhanafi.cerdikia.helper.MapelDescriptionHelper
 
 
 class HomeAdapter(private val itemList: List<MapelEntity>) :
@@ -31,7 +32,7 @@ class HomeAdapter(private val itemList: List<MapelEntity>) :
         val currentItem = itemList[position]
         holder.titleTextView.text = currentItem.nama_mapel
         holder.kelasTextView.text = "Kelas : ${currentItem.kelas}"
-        holder.descriptionTextView.text = "Deskripsi mapel ini belum tersedia, gunakan placeholder."
+        holder.descriptionTextView.text = MapelDescriptionHelper.getDescription(currentItem.nama_mapel)
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
             val materiId = position + 1 // Example: Use the position as a simple ID. You might need a more specific ID from your data.
