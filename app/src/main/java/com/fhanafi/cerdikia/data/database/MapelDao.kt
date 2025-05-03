@@ -12,9 +12,10 @@ interface MapelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMapels(mapels: List<MapelEntity>)
 
-    @Query("SELECT * FROM mapel_items WHERE finished = :finished")
-    suspend fun getMapelsByFinished(finished: Boolean): List<MapelEntity>
+    @Query("SELECT * FROM mapel_items WHERE finished = :finished AND kelas = :kelas")
+    fun getMapelsByFinishedAndKelasFlow(finished: Boolean, kelas: String): Flow<List<MapelEntity>>
 
-    @Query("SELECT * FROM mapel_items WHERE finished = :finished")
-    fun getMapelsByFinishedFlow(finished: Boolean): Flow<List<MapelEntity>>
+    @Query("SELECT * FROM mapel_items WHERE finished = :finished AND kelas = :kelas")
+    suspend fun getMapelsByFinishedAndKelas(finished: Boolean, kelas: String): List<MapelEntity>
+
 }

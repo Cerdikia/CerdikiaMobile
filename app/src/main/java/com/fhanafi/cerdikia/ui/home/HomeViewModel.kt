@@ -32,11 +32,11 @@ class HomeViewModel(private val mapelRepository: MapelRepository) : ViewModel() 
                 _mapels.value = apiData
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to fetch data: ${e.message}"
-                mapelRepository.getLocalMapels(finished)
+                mapelRepository.getLocalMapels(idKelas, finished)
                     .catch { _errorMessage.value = "Failed to load local data: ${it.message}" }
                     .collect { _mapels.value = it }
             } finally {
-                _isLoading.value = false
+                _isLoading.value = _mapels.value.isEmpty() // ← Keep loading true if still empty
             }
         }
     }
