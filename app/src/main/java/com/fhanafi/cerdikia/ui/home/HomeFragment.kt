@@ -6,21 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentHomeBinding
-import com.fhanafi.cerdikia.ui.rangking.RangkingViewModel
+import kotlinx.coroutines.flow.combine
 
 class HomeFragment : Fragment() {
 
@@ -48,15 +44,27 @@ class HomeFragment : Fragment() {
         // Observe StateFlow
         @Suppress("DEPRECATION")
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            homeViewModel.mapels.collect { mapelList ->
-                adapter = HomeAdapter(mapelList)
-                recyclerView.adapter = adapter
-                updateIndicatorDots(mapelList.size)
+            combine(
+                homeViewModel.isLoading,
+                homeViewModel.mapels
+            ) { isLoading, mapels ->
+                isLoading to mapels
+            }.collect { (isLoading, mapels) ->
+                if (isLoading) {
+                    val shimmerCount = 3
+                    recyclerView.adapter = HomeShimmerAdapter(itemCount = shimmerCount)
+                    updateIndicatorDots(shimmerCount)
+                    updatePageIndicatior(0) // ensure first dot is selected
+                } else {
+                    adapter = HomeAdapter(mapels)
+                    recyclerView.adapter = adapter
+                    updateIndicatorDots(mapels.size)
+                }
             }
         }
 
         // Observe loading or error if needed
-        homeViewModel.loadMapels(idKelas = 1, finished = false)
+        homeViewModel.loadMapels(idKelas = 1, finished = false) // just change it to true if want to fetch finished mapel
 
         val pagerSnapHelper = PagerSnapHelper()
         pagerSnapHelper.attachToRecyclerView(recyclerView)
