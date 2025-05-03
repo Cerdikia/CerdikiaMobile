@@ -10,93 +10,88 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentHomeBinding
+import com.fhanafi.cerdikia.ui.rangking.RangkingViewModel
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private val homeViewModel: HomeViewModel by viewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
     private lateinit var adapter: HomeAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var indicatorLayout: LinearLayout
     private var indicatorDots = mutableListOf<ImageView>()
-    private val placeHolderItem = listOf(
-        HomePlaceHolderItem("Bagian 1 : Judul", "3 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-        HomePlaceHolderItem("Bagian 2 : Judul", "0 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-        HomePlaceHolderItem("Bagian 3 : Judul", "0 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-        HomePlaceHolderItem("Bagian 4 : Judul", "0 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-        HomePlaceHolderItem("Bagian 5 : Judul", "0 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-        HomePlaceHolderItem("Bagian 6 : Judul", "0 / 10 Materi", "Deskripsi dari bagian ini bisa dengan penjelasan apapun"),
-    )
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        indicatorLayout = binding.indicatorLayout
-        updateIndicatorDots(placeHolderItem.size)
-
-        //setup recyclerview
-        recyclerView = binding.rvJudul
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        recyclerView.layoutManager
+        recyclerView = binding.rvJudul
+        recyclerView.layoutManager = layoutManager
 
-        adapter = HomeAdapter(placeHolderItem)
-        recyclerView.adapter = adapter
+        // Observe StateFlow
+        @Suppress("DEPRECATION")
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            homeViewModel.mapels.collect { mapelList ->
+                adapter = HomeAdapter(mapelList)
+                recyclerView.adapter = adapter
+                updateIndicatorDots(mapelList.size)
+            }
+        }
 
-        val pagerSnapHelper  = PagerSnapHelper()
+        // Observe loading or error if needed
+        homeViewModel.loadMapels(idKelas = 1, finished = false)
+
+        val pagerSnapHelper = PagerSnapHelper()
         pagerSnapHelper.attachToRecyclerView(recyclerView)
 
-        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if(newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val currentLayoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                    currentLayoutManager?.let {
-                        val currentPosition = it.findFirstCompletelyVisibleItemPosition()
-                        updatePageIndicatior(currentPosition)
-                    }
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    val currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
+                    updatePageIndicatior(currentPosition)
                 }
             }
         })
+
         exitApp()
         return root
     }
 
     private fun updateIndicatorDots(itemCount: Int) {
-        indicatorLayout.removeAllViews() //clear existing dots
+        indicatorLayout = binding.indicatorLayout
+        indicatorLayout.removeAllViews()
         indicatorDots.clear()
 
-        for(i in 0 until itemCount){
+        for (i in 0 until itemCount) {
             val dot = ImageView(requireContext())
             val layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            layoutParams.setMargins(8, 0, 8,0) // adjust margin as needed
+            ).apply { setMargins(8, 0, 8, 0) }
             dot.layoutParams = layoutParams
-            dot.layoutParams = layoutParams
-            dot.setImageResource(R.drawable.indicator_default) // Set default state
+            dot.setImageResource(R.drawable.indicator_default)
             indicatorDots.add(dot)
             indicatorLayout.addView(dot)
         }
 
-        if(indicatorDots.isNotEmpty()){
+        if (indicatorDots.isNotEmpty()) {
             indicatorDots[0].setImageResource(R.drawable.indicator_selected)
         }
     }
@@ -109,8 +104,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun exitApp(){
-        val callback = object: OnBackPressedCallback(true){
+    private fun exitApp() {
+        val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 requireActivity().finish()
             }
