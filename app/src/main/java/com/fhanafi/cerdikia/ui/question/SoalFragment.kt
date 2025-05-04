@@ -1,24 +1,26 @@
 package com.fhanafi.cerdikia.ui.question
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentSoalBinding
+import com.fhanafi.cerdikia.helper.stripHtmlTags
 
 class SoalFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = SoalFragment()
+    private val viewModel: SoalViewModel by activityViewModels{
+        ViewModelFactory.getInstance(requireContext())
     }
-    private val viewModel: SoalViewModel by viewModels()
     private var _binding: FragmentSoalBinding? = null
     private val binding get() = _binding!!
     private var materiId: Int = -1 // Declare at class level
@@ -49,58 +51,69 @@ class SoalFragment : Fragment() {
         setupObservers()
         setupJawaban()
         setupNextButton()
+        viewModel.fetchQuestions(materiId) // <<--- Call this here
     }
 
+    @Suppress("DEPRECATION")
     private fun setupObservers() {
-        viewModel.currentQuestion.observe(viewLifecycleOwner) { question ->
-            binding.tvSoal.text = question.questionText
-            answerOptionAdapter.updateOptions(question.answerOptions)
-            // Reset UI for the new question
-            binding.feedbackContainer.visibility = View.GONE
-            binding.btnNext.visibility = View.GONE
-            answerOptionAdapter.enableClicks()
-        }
-
-        viewModel.isCorrectAnswer.observe(viewLifecycleOwner) { isCorrect ->
-            if (isCorrect != null) {
-                binding.feedbackContainer.visibility = View.VISIBLE
-                binding.btnNext.visibility = View.VISIBLE
-                if (isCorrect) {
-                    binding.feedbackContainer.setBackgroundColor(resources.getColor(R.color.blueFieldAnswer, null))
-                    binding.textViewResult.text = "Benar !!"
-                    binding.textViewResult.setTextColor(resources.getColor(R.color.blueMain, null))
-                    binding.textViewCorrectAnswer.visibility = View.GONE
-                    binding.btnNext.setBackgroundColor(resources.getColor(R.color.blueMain, null))
-                    binding.btnNext.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_buttonblue)
-                } else {
-                    binding.feedbackContainer.setBackgroundColor(resources.getColor(R.color.redFieldAnswer, null))
-                    binding.textViewResult.text = "Salah !!"
-                    binding.textViewResult.setTextColor(resources.getColor(R.color.redMain, null))
-                    binding.textViewCorrectAnswer.visibility = View.VISIBLE
-                    binding.textViewCorrectAnswer.text = "Jawaban yang benar adalah: ${viewModel.currentQuestion.value?.correctAnswer}"
-                    binding.btnNext.setBackgroundColor(resources.getColor(R.color.redMain, null))
-                    binding.btnNext.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_buttonred)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.currentQuestion.collect { question ->
+                question?.let {
+                    binding.tvSoal.text = stripHtmlTags(question.questionText)
+                    answerOptionAdapter.updateOptions(question.answerOptions)
+                    // Reset UI for the new question
+                    binding.feedbackContainer.visibility = View.GONE
+                    binding.btnNext.visibility = View.GONE
+                    answerOptionAdapter.enableClicks()
                 }
             }
         }
 
-        viewModel.currentQuestionIndex.observe(viewLifecycleOwner) { index ->
-            updateProgressBar(index + 1, viewModel.questionList.value?.size ?: 1)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.isCorrectAnswer.collect { isCorrect ->
+                isCorrect?.let {
+                    binding.feedbackContainer.visibility = View.VISIBLE
+                    binding.btnNext.visibility = View.VISIBLE
+                    if (it) {
+                        binding.feedbackContainer.setBackgroundColor(resources.getColor(R.color.blueFieldAnswer, null))
+                        binding.textViewResult.text = "Benar !!"
+                        binding.textViewResult.setTextColor(resources.getColor(R.color.blueMain, null))
+                        binding.textViewCorrectAnswer.visibility = View.GONE
+                        binding.btnNext.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_buttonblue)
+                    } else {
+                        binding.feedbackContainer.setBackgroundColor(resources.getColor(R.color.redFieldAnswer, null))
+                        binding.textViewResult.text = "Salah !!"
+                        binding.textViewResult.setTextColor(resources.getColor(R.color.redMain, null))
+                        binding.textViewCorrectAnswer.visibility = View.VISIBLE
+                        val correctOption = viewModel.currentQuestion.value?.answerOptions
+                            ?.find { it.first == viewModel.currentQuestion.value?.correctAnswer }
+                        val cleanCorrectAnswer = correctOption?.second?.let { stripHtmlTags(it) }
+                        binding.textViewCorrectAnswer.text = "Jawaban yang benar adalah: $cleanCorrectAnswer"
+                        binding.btnNext.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_buttonred)
+                    }
+                }
+            }
         }
 
-        viewModel.isQuizFinished.observe(viewLifecycleOwner) { isFinished ->
-            if (isFinished == true) {
-                val xp = viewModel.correctAnswers * 2
-                val gems = if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.currentQuestionIndex.collect { index ->
+                updateProgressBar(index + 1, viewModel.questionList.value.size)
+            }
+        }
 
-                val bundle = Bundle().apply {
-                    putInt("XP", xp)
-                    putInt("GEMS", gems)
-                    putInt("materiId", materiId)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.isQuizFinished.collect { isFinished ->
+                if (isFinished) {
+                    val xp = viewModel.correctAnswers * 2
+                    val gems = if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0
+                    val bundle = Bundle().apply {
+                        putInt("XP", xp)
+                        putInt("GEMS", gems)
+                        putInt("materiId", materiId)
+                    }
+                    findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
+                    viewModel.resetQuiz()
                 }
-
-                findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
-                viewModel.resetQuizFinished()
             }
         }
     }

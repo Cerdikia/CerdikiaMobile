@@ -13,6 +13,7 @@ import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.remote.response.LogsSiswaResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
 import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
+import com.fhanafi.cerdikia.data.remote.response.SoalResponse
 import com.fhanafi.cerdikia.data.remote.response.TokenResponse
 import com.fhanafi.cerdikia.data.remote.response.UpdatePointResponse
 import com.fhanafi.cerdikia.data.remote.response.UpdateProfileResponse
@@ -21,6 +22,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -77,4 +79,9 @@ interface ApiService {
     suspend fun postLogSiswa(
         @Body logsSiswaRequest: LogsSiswaRequest
     ): LogsSiswaResponse
+
+    @GET("genericSoal/{id_module}")
+    suspend fun getSoal(
+        @Path("id_module") idModule: Int
+    ): SoalResponse
 }

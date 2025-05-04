@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia.data.repository
 
+import com.fhanafi.cerdikia.data.remote.response.SoalDataItem
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import com.fhanafi.cerdikia.ui.stage.MateriItem
 
@@ -23,6 +24,11 @@ class MateriRepository(private val apiService: ApiService) {
                 )
             }
         } ?: emptyList()
+    }
+
+    suspend fun getSoalByModule(idModule: Int): List<SoalDataItem> {
+        val response = apiService.getSoal(idModule)
+        return response.data?.filterNotNull() ?: emptyList()
     }
 
     companion object {

@@ -14,6 +14,7 @@ import com.fhanafi.cerdikia.data.repository.RangkingRepository
 import com.fhanafi.cerdikia.data.repository.UserRepository
 import com.fhanafi.cerdikia.ui.home.HomeViewModel
 import com.fhanafi.cerdikia.ui.login.AuthViewModel
+import com.fhanafi.cerdikia.ui.question.SoalViewModel
 import com.fhanafi.cerdikia.ui.rangking.RangkingViewModel
 import com.fhanafi.cerdikia.ui.stage.StageViewModel
 
@@ -70,6 +71,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(StageViewModel::class.java) -> {
                 StageViewModel(materiRepository) as T
+            }
+            modelClass.isAssignableFrom(SoalViewModel::class.java) -> {
+                SoalViewModel(materiRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

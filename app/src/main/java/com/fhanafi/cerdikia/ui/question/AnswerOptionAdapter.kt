@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.helper.stripHtmlTags
 
 class AnswerOptionAdapter(
-    private var answerOptions: List<String>,
+    private var answerOptions: List<Pair<String, String>>,
     private val onItemClick: (String) -> Unit
 ) : RecyclerView.Adapter<AnswerOptionAdapter.AnswerOptionViewHolder>()  {
 
@@ -23,7 +24,7 @@ class AnswerOptionAdapter(
                 if(isClickEnabled){
                     val position = adapterPosition
                     if(position != RecyclerView.NO_POSITION){
-                        onItemClick(answerOptions[position])
+                        onItemClick(answerOptions[position].first) // -> kirim key ("a", "b", dst)
                         disableClicks()
                     }
                 }
@@ -38,13 +39,13 @@ class AnswerOptionAdapter(
     }
 
     override fun onBindViewHolder(holder: AnswerOptionViewHolder, position: Int) {
-        val currentAnswer = answerOptions[position]
+        val currentAnswer = stripHtmlTags(answerOptions[position].second)
         holder.answerButton.text = currentAnswer
     }
 
     override fun getItemCount() = answerOptions.size
 
-    fun updateOptions(newOptions: List<String>) {
+    fun updateOptions(newOptions: List<Pair<String, String>>) {
         answerOptions = newOptions
         notifyDataSetChanged()
     }
