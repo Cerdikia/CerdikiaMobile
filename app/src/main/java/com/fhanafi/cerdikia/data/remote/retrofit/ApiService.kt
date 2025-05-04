@@ -1,13 +1,16 @@
 package com.fhanafi.cerdikia.data.remote.retrofit
 
 import com.fhanafi.cerdikia.data.remote.request.LoginRequest
+import com.fhanafi.cerdikia.data.remote.request.LogsSiswaRequest
 import com.fhanafi.cerdikia.data.remote.request.RegisterRequest
 import com.fhanafi.cerdikia.data.remote.request.TokenRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
 import com.fhanafi.cerdikia.data.remote.response.GetMapelResponse
+import com.fhanafi.cerdikia.data.remote.response.GetMateriResponse
 import com.fhanafi.cerdikia.data.remote.response.GetPointResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
+import com.fhanafi.cerdikia.data.remote.response.LogsSiswaResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
 import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
 import com.fhanafi.cerdikia.data.remote.response.TokenResponse
@@ -61,4 +64,17 @@ interface ApiService {
         @Query("id_kelas") idKelas: Int,
         @Query("finished") idMapel: Boolean
     ): GetMapelResponse
+
+    @GET("genericModules")
+    suspend fun getMateri(
+        @Query("id_mapel") idMapel: Int,
+        @Query("id_kelas") idKelas: Int,
+        @Query("finished") finished: Boolean,
+        @Query("email") email: String
+    ): GetMateriResponse
+
+    @POST("logs")
+    suspend fun postLogSiswa(
+        @Body logsSiswaRequest: LogsSiswaRequest
+    ): LogsSiswaResponse
 }

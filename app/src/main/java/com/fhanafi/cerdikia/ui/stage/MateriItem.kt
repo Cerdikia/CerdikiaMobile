@@ -1,9 +1,11 @@
 package com.fhanafi.cerdikia.ui.stage
 
+import com.google.gson.annotations.SerializedName
+
 data class MateriItem(
-//    val title: String,
-//    val description: String,
-//    val iconResourceId: Int,
+    @SerializedName("id_module")
     val id: Int,
-    var isCompleted: Boolean = false
+    val title: String = "",
+    val description: String = "",
+    val isCompleted: Boolean = false
 )

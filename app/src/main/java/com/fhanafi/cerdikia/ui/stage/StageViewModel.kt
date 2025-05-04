@@ -1,39 +1,31 @@
 package com.fhanafi.cerdikia.ui.stage
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.fhanafi.cerdikia.R
+import androidx.lifecycle.*
+import com.fhanafi.cerdikia.data.repository.MateriRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class StageViewModel : ViewModel() {
-    
-    private val _materiList = MutableLiveData<List<MateriItem>>()
-    val materiList: LiveData<List<MateriItem>> = _materiList
-    
-    init {
-        loadMateri()
-    }
-    //TODO: #1 harus memastikan si materi ada id untuk identifier entah di API atau di local
-    //TODO: #2 icon drawable harusnya di set di local bukan melalui api karana bisa memberatkan komputasi api
-    //TODO: #3 untuk soal yang sudah selesai icon dari materi berubah menjadi ic_finish dan jika belum menjadi ic_lock dan ic_unlock di mana progress player berada
-    private fun loadMateri(){
-        _materiList.value = listOf(
-//            MateriItem("Materi 1 from VM", "Deskripsi dari ViewModel 1", R.drawable.ic_unlock, 1),
-            MateriItem(1),
-            MateriItem(2),
-            MateriItem(3),
-            MateriItem(4),
-            MateriItem(5),
-            MateriItem(6),
-            MateriItem(7),
-            MateriItem(8),
-            MateriItem(9)
-        )
-    }
+class StageViewModel(private val materiRepository: MateriRepository) : ViewModel() {
 
-    fun updateMateriCompletion(materiId: Int) {
-        _materiList.value = _materiList.value?.map {
-            if (it.id == materiId) it.copy(isCompleted = true) else it
+    private val _materiList = MutableStateFlow<List<MateriItem>>(emptyList())
+    val materiList: StateFlow<List<MateriItem>> = _materiList
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    fun loadMateri(idMapel: Int, idKelas: Int, email: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val materi = materiRepository.getMateriList(idMapel, idKelas, email)
+                _materiList.value = materi
+            } catch (e: Exception) {
+                _materiList.value = emptyList()
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 }

@@ -13,8 +13,10 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
@@ -22,15 +24,16 @@ import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StageFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = StageFragment()
-    }
     private var _binding: FragmentStageBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: StageViewModel by viewModels()
+    private val viewModel: StageViewModel by activityViewModels{
+        ViewModelFactory.getInstance(requireContext())
+    }
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
@@ -47,10 +50,8 @@ class StageFragment : Fragment() {
 
         val recyclerView = binding.recyclerViewMateri
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = MateriAdapter(emptyList()) { clickedView, materiItem -> // Receive the View
-            val title = "Modul ${materiItem.id}"
-            val description = "Ini adalah deskripsi dari modul ${materiItem.id}"
-            showPopupModul(clickedView, title, description) { // Pass the View to showPopupModul
+        adapter = MateriAdapter(emptyList()) { clickedView, materiItem ->
+            showPopupModul(clickedView, materiItem.title, materiItem.description) {
                 val bundle = Bundle().apply {
                     putInt("materiId", materiItem.id)
                 }
@@ -60,24 +61,30 @@ class StageFragment : Fragment() {
         }
         recyclerView.adapter = adapter
 
-        viewModel.materiList.observe(viewLifecycleOwner, Observer { materiItems ->
-            adapter.setData(materiItems) // If using ListAdapter
-
-        })
-
         setupObserver()
         return root
     }
 
+    private var isLoaded = false
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val idMapel = arguments?.getInt("idMapel") ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            userViewModel.userData.collectLatest { user ->
+                if (!isLoaded) {
+                    viewModel.loadMateri(idMapel, user.kelas, user.email)
+                    isLoaded = true
+                }
+            }
+        }
+    }
+
     @Suppress("DEPRECATION")
-    private fun setupObserver(){
-        lifecycleScope.launchWhenStarted {
-            userViewModel.userData.collect { userModel ->
-                val completedIds = userModel.completedMateriIds
-                val updatedList = viewModel.materiList.value?.map {
-                    it.copy(isCompleted = completedIds.contains(it.id))
-                } ?: emptyList()
-                adapter.setData(updatedList)
+    private fun setupObserver() {
+        lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.materiList.collect { materiList ->
+                    adapter.setData(materiList)
+                }
             }
         }
     }
