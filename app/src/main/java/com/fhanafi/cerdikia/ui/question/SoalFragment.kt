@@ -1,6 +1,7 @@
 package com.fhanafi.cerdikia.ui.question
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,7 @@ class SoalFragment : Fragment() {
     private var _binding: FragmentSoalBinding? = null
     private val binding get() = _binding!!
     private var materiId: Int = -1 // Declare at class level
-
+    private var idMapel: Int = -1 // Declare at class level
     private lateinit var answerOptionAdapter: AnswerOptionAdapter
 
     override fun onCreateView(
@@ -36,6 +37,8 @@ class SoalFragment : Fragment() {
         //Hide bottom navigation
         (activity as? MainActivity)?.setBottomNavigationVisibility(false)
         materiId = arguments?.getInt("materiId") ?: -1
+        idMapel = arguments?.getInt("idMapel") ?: -1
+        Log.d("StageFragment", "Received idMapel SoalFragment: $idMapel")
         closeButton()
         return binding.root
     }
@@ -59,9 +62,43 @@ class SoalFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.currentQuestion.collect { question ->
                 question?.let {
-                    binding.tvSoal.text = stripHtmlTags(question.questionText)
+                    val soalText = question.questionText
+
+                    val hasHtmlTags = soalText.contains("<img") && soalText.contains("<p")
+
+                    if (hasHtmlTags) {
+                        binding.webSoal.visibility = View.VISIBLE
+                        binding.tvSoal.visibility = View.GONE
+
+                        val htmlContent = """
+                    <html>
+                        <head>
+                            <style>
+                                body { font-size: 16px; padding: 0; margin: 0; }
+                                img { max-width: 100%; height: auto; display: block; margin: 10px auto; }
+                                p { margin: 8px 0; }
+                            </style>
+                        </head>
+                        <body>
+                            $soalText
+                        </body>
+                    </html>
+                """.trimIndent()
+
+                        binding.webSoal.settings.javaScriptEnabled = true
+                        binding.webSoal.loadDataWithBaseURL(null, htmlContent, "text/html", "utf-8", null)
+                        binding.webSoal.settings.setSupportZoom(false)
+                        binding.webSoal.settings.builtInZoomControls = false
+                        binding.webSoal.isClickable = false
+                        binding.webSoal.isLongClickable = false
+                        binding.webSoal.isFocusable = false
+                    } else {
+                        binding.webSoal.visibility = View.GONE
+                        binding.tvSoal.visibility = View.VISIBLE
+                        binding.tvSoal.text = stripHtmlTags(soalText)
+                    }
+
                     answerOptionAdapter.updateOptions(question.answerOptions)
-                    // Reset UI for the new question
                     binding.feedbackContainer.visibility = View.GONE
                     binding.btnNext.visibility = View.GONE
                     answerOptionAdapter.enableClicks()
@@ -110,6 +147,7 @@ class SoalFragment : Fragment() {
                         putInt("XP", xp)
                         putInt("GEMS", gems)
                         putInt("materiId", materiId)
+                        putInt("idMapel", idMapel)
                     }
                     findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
                     viewModel.resetQuiz()

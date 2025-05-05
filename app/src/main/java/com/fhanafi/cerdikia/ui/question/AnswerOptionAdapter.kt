@@ -3,6 +3,7 @@ package com.fhanafi.cerdikia.ui.question
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
@@ -18,6 +19,7 @@ class AnswerOptionAdapter(
     @Suppress("DEPRECATION")
     inner class AnswerOptionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val answerButton: Button = itemView.findViewById(R.id.buttonAnswerOption)
+        val answerWebView: WebView = itemView.findViewById(R.id.webViewAnswerOption)
 
         init {
             answerButton.setOnClickListener {
@@ -39,8 +41,43 @@ class AnswerOptionAdapter(
     }
 
     override fun onBindViewHolder(holder: AnswerOptionViewHolder, position: Int) {
-        val currentAnswer = stripHtmlTags(answerOptions[position].second)
-        holder.answerButton.text = currentAnswer
+        val answerRawHtml = answerOptions[position].second
+
+        if (answerRawHtml.contains("<img", ignoreCase = true)) {
+            // Use WebView for image-based answers
+            holder.answerWebView.visibility = View.VISIBLE
+            holder.answerButton.visibility = View.GONE
+
+            val htmlContent = """
+        <html>
+            <head>
+                <style>
+                    body { font-size: 16px; padding: 0; margin: 0; text-align: center; }
+                    img { max-width: 100%; height: auto; display: block; margin: auto; }
+                    p { margin: 8px 0; }
+                </style>
+            </head>
+            <body>
+                $answerRawHtml
+            </body>
+        </html>
+    """.trimIndent()
+
+            with(holder.answerWebView) {
+                settings.javaScriptEnabled = false
+                settings.setSupportZoom(false)
+                settings.builtInZoomControls = false
+                isLongClickable = false
+                isClickable = false
+                loadDataWithBaseURL(null, htmlContent, "text/html", "utf-8", null)
+            }
+        } else {
+            // Use Button for plain text answers (even with <p>)
+            holder.answerWebView.visibility = View.GONE
+            holder.answerButton.visibility = View.VISIBLE
+            holder.answerButton.text = stripHtmlTags(answerRawHtml)
+        }
+
     }
 
     override fun getItemCount() = answerOptions.size

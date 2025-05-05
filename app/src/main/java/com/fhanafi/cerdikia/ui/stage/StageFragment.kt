@@ -2,6 +2,7 @@ package com.fhanafi.cerdikia.ui.stage
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import androidx.fragment.app.Fragment
@@ -22,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
-import com.fhanafi.cerdikia.data.pref.UserPreference
+import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -50,23 +51,33 @@ class StageFragment : Fragment() {
 
         val recyclerView = binding.recyclerViewMateri
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val idMapel = arguments?.getInt("idMapel") ?: -1
+        Log.d("StageFragment", "Received idMapel StageFragment: $idMapel")
         adapter = MateriAdapter(emptyList()) { clickedView, materiItem ->
-            showPopupModul(clickedView, materiItem.title, materiItem.description) {
-                val bundle = Bundle().apply {
-                    putInt("materiId", materiItem.id)
-                }
-                requireView().findNavController()
-                    .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
-            }
+            showPopupModul(clickedView, materiItem.title, materiItem.description, materiItem.id, idMapel)
         }
         recyclerView.adapter = adapter
-
+        loadData()
         setupObserver()
         return root
     }
 
-    private var isLoaded = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        parentFragmentManager.setFragmentResultListener("requestKey", viewLifecycleOwner) { _, bundle ->
+            val newIdMapel = bundle.getInt("idMapel", -1)
+            Log.d("StageFragment", "Received via FragmentResult: $newIdMapel")
+            if (newIdMapel != -1) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    userViewModel.userData.collectLatest { user ->
+                        viewModel.loadMateri(newIdMapel, user.kelas, user.email)
+                    }
+                }
+            }
+        }
+    }
+
+    private var isLoaded = false
+    private fun loadData(){
         val idMapel = arguments?.getInt("idMapel") ?: return
         viewLifecycleOwner.lifecycleScope.launch {
             userViewModel.userData.collectLatest { user ->
@@ -91,7 +102,7 @@ class StageFragment : Fragment() {
 
     private var popupWindow: PopupWindow? = null
 
-    private fun showPopupModul(anchorView: View, title: String, description: String, onMulaiClicked: () -> Unit) {
+    private fun showPopupModul(anchorView: View, title: String, description: String, materiId: Int, idMapel: Int) {
         val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_materi_info, null)
         val widthPx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -105,12 +116,7 @@ class StageFragment : Fragment() {
             resources.displayMetrics
         ).toInt()
 
-        popupWindow = PopupWindow(
-            popupView,
-            widthPx, // Set fixed width
-            heightPx, // Set fixed height
-            true
-        )
+        popupWindow = PopupWindow(popupView, widthPx, heightPx, true)
 
         val tvJudul = popupView.findViewById<TextView>(R.id.tv_judul_modul)
         val tvDeskripsi = popupView.findViewById<TextView>(R.id.tv_deskripsi_modul)
@@ -118,16 +124,20 @@ class StageFragment : Fragment() {
 
         tvJudul.text = title
         tvDeskripsi.text = description
+
         btnMulai.setOnClickListener {
             popupWindow?.dismiss()
             popupWindow = null
-            onMulaiClicked()
+
+            val bundle = Bundle().apply {
+                putInt("materiId", materiId)
+                putInt("idMapel", idMapel)
+            }
+            requireView().findNavController()
+                .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
         }
 
-        // Make sure the popup has a background to handle outside touches for dismissal
         popupWindow?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), android.R.color.transparent))
-
-        // Show the popup below the anchor view
         popupWindow?.showAsDropDown(anchorView, -250, 8)
     }
 

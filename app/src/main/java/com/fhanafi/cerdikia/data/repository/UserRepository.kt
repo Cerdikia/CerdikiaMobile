@@ -2,6 +2,7 @@ package com.fhanafi.cerdikia.data.repository
 
 import com.fhanafi.cerdikia.data.pref.UserModel
 import com.fhanafi.cerdikia.data.pref.UserPreference
+import com.fhanafi.cerdikia.data.remote.request.LogsSiswaRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
@@ -97,6 +98,16 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun addCompletedMateriId(id: Int) {
         userPreference.addCompletedMateri(id)
+    }
+
+    suspend fun postLogSiswa(idModule: Int, idKelas: Int, idMapel: Int, email: String, skor: Int) {
+        val request = LogsSiswaRequest(idModule = idModule, idKelas = idKelas, idMapel = idMapel, email = email, skor = skor)
+
+        val response = apiService.postLogSiswa(request)
+
+        if (!response.message!!.contains("Success", ignoreCase = true)) {
+            throw Exception("Failed to post log: ${response.message}")
+        }
     }
 
     companion object {

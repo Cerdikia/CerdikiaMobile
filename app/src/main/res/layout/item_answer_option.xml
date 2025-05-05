@@ -9,15 +9,26 @@
     app:cardCornerRadius="24dp"
     app:cardElevation="2dp">
 
-    <Button
-        android:id="@+id/buttonAnswerOption"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@drawable/rounded_answer_button"
-        android:gravity="center"
-        android:padding="8dp"
-        android:text="Jawaban 1"
-        android:textColor="@color/textColorAnswer"
-        android:textSize="16sp" />
+        android:padding="8dp">
 
+        <Button
+            android:id="@+id/buttonAnswerOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@android:color/transparent"
+            android:textColor="@color/black"
+            android:text="Jawaban"
+            android:textSize="16sp" />
+
+        <WebView
+            android:id="@+id/webViewAnswerOption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </FrameLayout>
 </androidx.cardview.widget.CardView>
