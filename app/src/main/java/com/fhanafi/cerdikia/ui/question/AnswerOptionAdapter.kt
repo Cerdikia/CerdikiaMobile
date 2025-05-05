@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia.ui.question
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ class AnswerOptionAdapter(
         return AnswerOptionViewHolder(itemView)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: AnswerOptionViewHolder, position: Int) {
         val answerRawHtml = answerOptions[position].second
 
@@ -68,8 +70,20 @@ class AnswerOptionAdapter(
                 settings.setSupportZoom(false)
                 settings.builtInZoomControls = false
                 isLongClickable = false
-                isClickable = false
+                isClickable = true
+                isFocusable = true
+                isFocusableInTouchMode = true
+
                 loadDataWithBaseURL(null, htmlContent, "text/html", "utf-8", null)
+
+                // Handle touch instead of click
+                setOnTouchListener { _, _ ->
+                    if (isClickEnabled) {
+                        onItemClick(answerOptions[position].first)
+                        disableClicks()
+                    }
+                    true
+                }
             }
         } else {
             // Use Button for plain text answers (even with <p>)

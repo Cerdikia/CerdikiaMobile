@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".ui.question.SoalFragment">
 
+   <!-- <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#CCFFFFFF"
+        >
+        <include
+            layout="@layout/layout_loading_overlay"
+            android:id="@+id/loadingOverlayInclude"
+            />
+    </FrameLayout>-->
+
     <ImageView
         android:id="@+id/btn_close"
         android:layout_width="16dp"
@@ -17,7 +30,8 @@
         app:layout_constraintEnd_toStartOf="@+id/progressSoal"
         app:layout_constraintBottom_toBottomOf="@+id/progressSoal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <ProgressBar
         android:id="@+id/progressSoal"
@@ -31,7 +45,8 @@
         android:max="100"
         android:progressDrawable="@drawable/yellow_progress"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/tv_soal"
@@ -46,7 +61,8 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressSoal" />
+        app:layout_constraintTop_toBottomOf="@id/progressSoal"
+        android:visibility="gone"/>
 
     <WebView
         android:id="@+id/webSoal"
@@ -87,7 +103,7 @@
         android:orientation="horizontal"
         android:background="@color/blueFieldAnswer"
         android:padding="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

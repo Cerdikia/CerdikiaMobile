@@ -54,7 +54,7 @@ class StageFragment : Fragment() {
         val idMapel = arguments?.getInt("idMapel") ?: -1
         Log.d("StageFragment", "Received idMapel StageFragment: $idMapel")
         adapter = MateriAdapter(emptyList()) { clickedView, materiItem ->
-            showPopupModul(clickedView, materiItem.title, materiItem.description, materiItem.id, idMapel)
+            showPopupModul(clickedView, materiItem.title, materiItem.description, materiItem.id, idMapel, materiItem.isCompleted)
         }
         recyclerView.adapter = adapter
         loadData()
@@ -102,7 +102,7 @@ class StageFragment : Fragment() {
 
     private var popupWindow: PopupWindow? = null
 
-    private fun showPopupModul(anchorView: View, title: String, description: String, materiId: Int, idMapel: Int) {
+    private fun showPopupModul(anchorView: View, title: String, description: String, materiId: Int, idMapel: Int, isCompleted: Boolean) {
         val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_materi_info, null)
         val widthPx = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -132,6 +132,7 @@ class StageFragment : Fragment() {
             val bundle = Bundle().apply {
                 putInt("materiId", materiId)
                 putInt("idMapel", idMapel)
+                putBoolean("isCompleted", isCompleted)
             }
             requireView().findNavController()
                 .navigate(R.id.action_stageFragment_to_soalFragment, bundle)

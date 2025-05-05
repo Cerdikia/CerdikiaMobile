@@ -16,6 +16,9 @@ data class MateriDataItem(
 	@field:SerializedName("id_module")
 	val idModule: Int? = null,
 
+	@field:SerializedName("is_ready")
+	val isReady: Boolean? = null,
+
 	@field:SerializedName("module")
 	val module: Int? = null,
 

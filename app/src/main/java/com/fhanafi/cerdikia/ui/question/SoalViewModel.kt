@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.fhanafi.cerdikia.helper.stripHtmlTags
+import kotlinx.coroutines.delay
 
 class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
 
@@ -50,6 +51,7 @@ class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
             try {
+                delay(3000) // biar ada effect loading
                 val soalList = repository.getSoalByModule(idModule)
                 val mapped = soalList.map { it.toQuestion() }
                 _questionList.value = mapped

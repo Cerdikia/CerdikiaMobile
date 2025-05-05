@@ -16,6 +16,9 @@ import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentSoalBinding
 import com.fhanafi.cerdikia.helper.stripHtmlTags
+import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
 
 class SoalFragment : Fragment() {
 
@@ -26,7 +29,21 @@ class SoalFragment : Fragment() {
     private val binding get() = _binding!!
     private var materiId: Int = -1 // Declare at class level
     private var idMapel: Int = -1 // Declare at class level
+    private var isCompleted: Boolean = false
     private lateinit var answerOptionAdapter: AnswerOptionAdapter
+    private var loadingDialog: LoadingDialogFragment? = null
+
+    private fun showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialogFragment()
+            loadingDialog?.show(parentFragmentManager, "loading")
+        }
+    }
+
+    private fun hideLoading() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,6 +55,7 @@ class SoalFragment : Fragment() {
         (activity as? MainActivity)?.setBottomNavigationVisibility(false)
         materiId = arguments?.getInt("materiId") ?: -1
         idMapel = arguments?.getInt("idMapel") ?: -1
+        isCompleted = arguments?.getBoolean("isCompleted") ?: false
         Log.d("StageFragment", "Received idMapel SoalFragment: $idMapel")
         closeButton()
         return binding.root
@@ -133,8 +151,13 @@ class SoalFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.currentQuestionIndex.collect { index ->
-                updateProgressBar(index + 1, viewModel.questionList.value.size)
+            combine(
+                viewModel.currentQuestionIndex,
+                viewModel.questionList
+            ) { index, list ->
+                index to list.size
+            }.collect { (index, total) ->
+                updateProgressBar(index + 1, total)
             }
         }
 
@@ -148,10 +171,25 @@ class SoalFragment : Fragment() {
                         putInt("GEMS", gems)
                         putInt("materiId", materiId)
                         putInt("idMapel", idMapel)
+                        putBoolean("isCompleted", isCompleted)
                     }
                     findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
                     viewModel.resetQuiz()
                 }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.isLoading.collect { isLoading ->
+                if (isLoading) {
+                    showLoading()
+                } else {
+                    hideLoading()
+                }
+
+                binding.btnClose.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.progressSoal.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.rvOpsijawaban.visibility = if (isLoading) View.GONE else View.VISIBLE
+                binding.tvSoal.visibility = if (isLoading) View.GONE else View.VISIBLE
             }
         }
     }
@@ -174,8 +212,12 @@ class SoalFragment : Fragment() {
     }
 
     private fun updateProgressBar(currentQuestion: Int, totalQuestions: Int) {
-        val progress = (currentQuestion.toFloat() / totalQuestions * 100).toInt()
-        binding.progressSoal.progress = progress
+        if (totalQuestions > 0) {
+            val progress = (currentQuestion.toFloat() / totalQuestions * 100).toInt()
+            binding.progressSoal.progress = progress
+        } else {
+            binding.progressSoal.progress = 0 // Set ke 0 kalau belum ada data
+        }
     }
 
     override fun onDestroy() {
