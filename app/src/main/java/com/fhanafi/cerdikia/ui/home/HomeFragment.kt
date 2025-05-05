@@ -9,20 +9,27 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentHomeBinding
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
+    private val userViewModel: UserViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
     }
     private lateinit var adapter: HomeAdapter
@@ -43,28 +50,36 @@ class HomeFragment : Fragment() {
 
         // Observe StateFlow
         @Suppress("DEPRECATION")
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            combine(
-                homeViewModel.isLoading,
-                homeViewModel.mapels
-            ) { isLoading, mapels ->
-                isLoading to mapels
-            }.collect { (isLoading, mapels) ->
-                if (isLoading) {
-                    val shimmerCount = 3
-                    recyclerView.adapter = HomeShimmerAdapter(itemCount = shimmerCount)
-                    updateIndicatorDots(shimmerCount)
-                    updatePageIndicatior(0) // ensure first dot is selected
-                } else {
-                    adapter = HomeAdapter(mapels)
-                    recyclerView.adapter = adapter
-                    updateIndicatorDots(mapels.size)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                combine(
+                    homeViewModel.isLoading,
+                    homeViewModel.mapels
+                ) { isLoading, mapels ->
+                    isLoading to mapels
+                }.collect { (isLoading, mapels) ->
+                    if (isLoading) {
+                        val shimmerCount = 3
+                        recyclerView.adapter = HomeShimmerAdapter(itemCount = shimmerCount)
+                        updateIndicatorDots(shimmerCount)
+                        updatePageIndicatior(0) // ensure first dot is selected
+                    } else {
+                        adapter = HomeAdapter(mapels)
+                        recyclerView.adapter = adapter
+                        updateIndicatorDots(mapels.size)
+                    }
                 }
             }
         }
 
         // Observe loading or error if needed
-        homeViewModel.loadMapels(idKelas = 1, finished = false) // just change it to true if want to fetch finished mapel
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userViewModel.userData.collect { user ->
+                    homeViewModel.loadMapels(idKelas = user.kelas, finished = false) // just change it to true if want to fetch finished mapel
+                }
+            }
+        }
 
         val pagerSnapHelper = PagerSnapHelper()
         pagerSnapHelper.attachToRecyclerView(recyclerView)

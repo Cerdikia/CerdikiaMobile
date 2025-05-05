@@ -35,9 +35,9 @@ class HomeAdapter(private val itemList: List<MapelEntity>) :
         holder.descriptionTextView.text = MapelDescriptionHelper.getDescription(currentItem.nama_mapel)
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
-            val materiId = position + 1 // Example: Use the position as a simple ID. You might need a more specific ID from your data.
+            val idMapel = currentItem.id_mapel // From your API response
             val bundle = Bundle().apply {
-                putInt("materiId", materiId)
+                putInt("idMapel", idMapel) // Pass this to StageFragment
             }
             holder.itemView.findNavController().navigate(R.id.action_navigation_home_to_stageFragment, bundle)
         }

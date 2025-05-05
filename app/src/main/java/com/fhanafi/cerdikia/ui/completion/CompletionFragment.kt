@@ -1,16 +1,20 @@
 package com.fhanafi.cerdikia.ui.completion
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.databinding.FragmentCompletionBinding
 import com.fhanafi.cerdikia.R
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CompletionFragment : Fragment() {
@@ -32,19 +36,25 @@ class CompletionFragment : Fragment() {
         val xp = arguments?.getInt("XP") ?: 0
         val gems = arguments?.getInt("GEMS") ?: 0
         val materiId = arguments?.getInt("materiId") ?: -1
+        val idMapel = arguments?.getInt("idMapel") ?: -1
+        val isAlreadyCompleted = arguments?.getBoolean("isCompleted") ?: false
 
         binding.tvXp.text = "$xp"
 
         @Suppress("DEPRECATION")
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             userViewModel.userData.collect { user ->
-                val isAlreadyCompleted = user.completedMateriIds.contains(materiId)
+//                val localCompleted = user.completedMateriIds.contains(materiId)
+//                val isAlreadyCompleted = remoteCompleted || localCompleted // i want to more defensive  to check each other
 
                 binding.btnCompletion.setOnClickListener {
                     if (materiId != -1) {
                         if (!isAlreadyCompleted) {
-                            userViewModel.addCompletedMateriId(materiId)
-                            userViewModel.updateUserProgress(xp = 0, gems = gems, completedId = materiId)
+                            userViewModel.updateUserProgress(
+                                xp = 0,
+                                gems = gems,
+                                completedId = materiId //
+                            )
                         }
 
                         viewLifecycleOwner.lifecycleScope.launch {
@@ -54,14 +64,20 @@ class CompletionFragment : Fragment() {
                                 gems = if (isAlreadyCompleted) 0 else gems
                             )
 
+                            val skor = xp * 10
+                            userViewModel.postLogSiswa(
+                                idModule = materiId,
+                                idKelas = user.kelas,
+                                idMapel = idMapel,
+                                skor = skor
+                            )
                             // 2. Wait until GET (refresh) completes
                             val job = launch { userViewModel.refreshPointData() }
                             job.join() // Ensure it's completed before navigating
 
                             // 3. Navigate
-                            findNavController().popBackStack()
-                            findNavController().popBackStack()
-                            findNavController().navigate(R.id.stageFragment)
+                            setFragmentResult("requestKey", bundleOf("idMapel" to idMapel))
+                            findNavController().popBackStack(R.id.stageFragment, false)
                         }
                     }
                 }
@@ -74,3 +90,4 @@ class CompletionFragment : Fragment() {
         _binding = null
     }
 }
+

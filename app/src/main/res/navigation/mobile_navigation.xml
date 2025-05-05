@@ -14,7 +14,7 @@
             android:id="@+id/action_navigation_home_to_stageFragment"
             app:destination="@id/stageFragment">
             <argument
-                android:name="materiId"
+                android:name="idMapel"
                 android:defaultValue="-1"
                 app:argType="integer" />
         </action>
@@ -25,7 +25,7 @@
         android:label="StageFragment"
         tools:layout="@layout/fragment_stage">
         <argument
-            android:name="materiId"
+            android:name="idMapel"
             android:defaultValue="-1"
             app:argType="integer" />
         <action

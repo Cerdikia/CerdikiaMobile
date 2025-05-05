@@ -9,11 +9,14 @@ import com.fhanafi.cerdikia.data.pref.dataStore
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
 import com.fhanafi.cerdikia.data.repository.AuthRepository
 import com.fhanafi.cerdikia.data.repository.MapelRepository
+import com.fhanafi.cerdikia.data.repository.MateriRepository
 import com.fhanafi.cerdikia.data.repository.RangkingRepository
 import com.fhanafi.cerdikia.data.repository.UserRepository
 import com.fhanafi.cerdikia.ui.home.HomeViewModel
 import com.fhanafi.cerdikia.ui.login.AuthViewModel
+import com.fhanafi.cerdikia.ui.question.SoalViewModel
 import com.fhanafi.cerdikia.ui.rangking.RangkingViewModel
+import com.fhanafi.cerdikia.ui.stage.StageViewModel
 
 object ViewModelFactory : ViewModelProvider.Factory {
 
@@ -21,6 +24,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
     private lateinit var authRepository: AuthRepository
     private lateinit var rangkingRepository: RangkingRepository
     private lateinit var mapelRepository: MapelRepository
+    private lateinit var materiRepository: MateriRepository
 
     private fun initRepositories(context: Context) {
         val pref = UserPreference.getInstance(context.dataStore)
@@ -39,6 +43,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
         }
         if (!::mapelRepository.isInitialized) {
             mapelRepository = MapelRepository(apiService, mapelDao)
+        }
+        if(!::materiRepository.isInitialized){
+            materiRepository = MateriRepository(apiService)
         }
     }
 
@@ -61,6 +68,12 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
                 HomeViewModel(mapelRepository) as T
+            }
+            modelClass.isAssignableFrom(StageViewModel::class.java) -> {
+                StageViewModel(materiRepository) as T
+            }
+            modelClass.isAssignableFrom(SoalViewModel::class.java) -> {
+                SoalViewModel(materiRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

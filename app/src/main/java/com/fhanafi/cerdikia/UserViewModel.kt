@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.UserModel
 import com.fhanafi.cerdikia.data.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
@@ -68,4 +69,20 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    fun postLogSiswa(idModule: Int, idKelas: Int, idMapel: Int, skor: Int) {
+        viewModelScope.launch {
+            try {
+                val user = userData.first() // Get latest user info (for email)
+                userRepository.postLogSiswa(
+                    idModule = idModule,
+                    idKelas = user.kelas,
+                    idMapel = idMapel,
+                    email = user.email,
+                    skor = skor
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }

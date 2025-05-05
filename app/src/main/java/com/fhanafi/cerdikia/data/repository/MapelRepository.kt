@@ -24,12 +24,12 @@ class MapelRepository(private val apiService: ApiService, private val mapelDao: 
             mapelList
         } catch (e: Exception) {
             // fallback to local DB if network fails
-            mapelDao.getMapelsByFinished(finished)
+            mapelDao.getMapelsByFinishedAndKelas(finished, idKelas.toString())
         }
     }
 
-    fun getLocalMapels(finished: Boolean): Flow<List<MapelEntity>> {
-        return mapelDao.getMapelsByFinishedFlow(finished)
+    fun getLocalMapels(idKelas: Int, finished: Boolean): Flow<List<MapelEntity>> {
+        return mapelDao.getMapelsByFinishedAndKelasFlow(finished, idKelas.toString())
     }
 
     companion object {
