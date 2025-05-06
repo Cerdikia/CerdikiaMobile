@@ -87,6 +87,7 @@ class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
     }
 
     fun resetQuiz() {
+        _questionList.value = emptyList()
         _currentQuestionIndex.value = 0
         _correctAnswers = 0
         _answerSelected.value = null

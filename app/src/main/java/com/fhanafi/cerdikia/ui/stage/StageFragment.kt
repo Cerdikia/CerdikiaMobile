@@ -25,6 +25,8 @@ import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
+import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -40,7 +42,18 @@ class StageFragment : Fragment() {
     }
 
     private lateinit var adapter: MateriAdapter
+    private var loadingDialog: LoadingDialogFragment? = null
+    private fun showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialogFragment()
+            loadingDialog?.show(parentFragmentManager, "loading")
+        }
+    }
 
+    private fun hideLoading() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
     //TODO: buat arrow_up dan judul dari materi yang diperlihatkan yang berfungsi untuk menclose recycleView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,8 +106,20 @@ class StageFragment : Fragment() {
     private fun setupObserver() {
         lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.materiList.collect { materiList ->
-                    adapter.setData(materiList)
+                launch {
+                    viewModel.materiList.collect { materiList ->
+                        adapter.setData(materiList)
+                    }
+                }
+                launch {
+                    viewModel.isLoading.collect { isLoading ->
+                        if (isLoading) {
+                            showLoading()
+                            delay(3000)
+                        } else {
+                            hideLoading()
+                        }
+                    }
                 }
             }
         }
