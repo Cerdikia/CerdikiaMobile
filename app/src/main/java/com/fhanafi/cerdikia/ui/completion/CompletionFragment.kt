@@ -14,6 +14,8 @@ import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.databinding.FragmentCompletionBinding
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -23,6 +25,18 @@ class CompletionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by activityViewModels()
+    private var loadingDialog: LoadingDialogFragment? = null
+    private fun showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialogFragment()
+            loadingDialog?.show(parentFragmentManager, "loading")
+        }
+    }
+
+    private fun hideLoading() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +72,7 @@ class CompletionFragment : Fragment() {
                         }
 
                         viewLifecycleOwner.lifecycleScope.launch {
+                            showLoading()
                             // 1. Update via API (incrementing)
                             userViewModel.updatePointAndRefresh(
                                 xp = xp,
@@ -74,7 +89,9 @@ class CompletionFragment : Fragment() {
                             // 2. Wait until GET (refresh) completes
                             val job = launch { userViewModel.refreshPointData() }
                             job.join() // Ensure it's completed before navigating
-
+                            binding.main.visibility = View.GONE
+                            delay(3000)
+                            hideLoading()
                             // 3. Navigate
                             setFragmentResult("requestKey", bundleOf("idMapel" to idMapel))
                             findNavController().popBackStack(R.id.stageFragment, false)

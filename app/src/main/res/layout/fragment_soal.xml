@@ -6,19 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.question.SoalFragment">
 
-   <!-- <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="#CCFFFFFF"
-        >
-        <include
-            layout="@layout/layout_loading_overlay"
-            android:id="@+id/loadingOverlayInclude"
-            />
-    </FrameLayout>-->
-
     <ImageView
         android:id="@+id/btn_close"
         android:layout_width="16dp"

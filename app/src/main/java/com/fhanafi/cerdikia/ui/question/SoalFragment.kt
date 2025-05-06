@@ -19,6 +19,7 @@ import com.fhanafi.cerdikia.helper.stripHtmlTags
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class SoalFragment : Fragment() {
 
@@ -164,17 +165,32 @@ class SoalFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.isQuizFinished.collect { isFinished ->
                 if (isFinished) {
-                    val xp = viewModel.correctAnswers * 2
-                    val gems = if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0
-                    val bundle = Bundle().apply {
-                        putInt("XP", xp)
-                        putInt("GEMS", gems)
-                        putInt("materiId", materiId)
-                        putInt("idMapel", idMapel)
-                        putBoolean("isCompleted", isCompleted)
+                    showLoading()
+
+                    launch {
+                        binding.btnClose.visibility = View.GONE
+                        binding.progressSoal.visibility = View.GONE
+                        binding.rvOpsijawaban.visibility = View.GONE
+                        binding.tvSoal.visibility = View.GONE
+                        binding.webSoal.visibility = View.GONE
+                        binding.feedbackContainer.visibility = View.GONE
+                        delay(3000) // Show loading effect for 3 seconds
+
+                        val xp = viewModel.correctAnswers * 2
+                        val gems = if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0
+                        val bundle = Bundle().apply {
+                            putInt("XP", xp)
+                            putInt("GEMS", gems)
+                            putInt("materiId", materiId)
+                            putInt("idMapel", idMapel)
+                            putBoolean("isCompleted", isCompleted)
+                        }
+
+                        hideLoading() // Hide loading before navigating
+                        findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
+                        viewModel.resetQuiz()
+
                     }
-                    findNavController().navigate(R.id.action_soalFragment_to_completionFragment, bundle)
-                    viewModel.resetQuiz()
                 }
             }
         }
