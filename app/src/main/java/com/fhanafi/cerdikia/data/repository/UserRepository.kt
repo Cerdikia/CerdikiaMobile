@@ -69,7 +69,6 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
 
     suspend fun fetchPointAndSave() {
         val response = apiService.getPoint()
-
         if (response.message.equals("Data retrieved successfully", ignoreCase = true)) {
             val currentUser = getUserData().first()
 
@@ -107,6 +106,27 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
 
         if (!response.message!!.contains("Success", ignoreCase = true)) {
             throw Exception("Failed to post log: ${response.message}")
+        }
+    }
+
+    suspend fun getEnergy(email: String) {
+        val response = apiService.getEnergy(email)
+
+        if (!response.message.orEmpty().contains("successful", ignoreCase = true)) {
+            throw Exception("Failed to get Energy: ${response.message}")
+        }
+
+        val energyValue = response.data?.energy
+        if (energyValue != null) {
+            val currentUser = userPreference.getUserData().first()
+
+            val updatedUser = currentUser.copy(
+                energy = energyValue // only updating energy
+            )
+
+            userPreference.saveUser(updatedUser)
+        } else {
+            throw Exception("Energy data is null")
         }
     }
 

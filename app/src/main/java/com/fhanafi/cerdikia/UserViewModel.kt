@@ -51,6 +51,9 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 userRepository.fetchPointAndSave()
+
+                val user = userData.first()
+                userRepository.getEnergy(user.email)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -31,6 +31,13 @@ class MateriRepository(private val apiService: ApiService) {
         return response.data?.filterNotNull() ?: emptyList()
     }
 
+    suspend fun useEnergy(email: String) {
+        val response = apiService.useEnergy(email)
+        if (!response.message.orEmpty().contains("success", ignoreCase = true)) {
+            throw Exception("Failed to use energy: ${response.message}")
+        }
+    }
+
     companion object {
         @Volatile
         private var instance: MateriRepository? = null

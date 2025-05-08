@@ -28,6 +28,7 @@ import com.fhanafi.cerdikia.databinding.FragmentStageBinding
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class StageFragment : Fragment() {
@@ -159,8 +160,18 @@ class StageFragment : Fragment() {
                 putInt("idMapel", idMapel)
                 putBoolean("isCompleted", isCompleted)
             }
-            requireView().findNavController()
-                .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
+
+            lifecycleScope.launch {
+                val user = userViewModel.userData.first()
+                try {
+                    viewModel.useEnergy(user.email)
+                    userViewModel.refreshPointData()
+                    requireView().findNavController()
+                        .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
+                } catch (e: Exception) {
+                    Log.e("StageFragment", "Failed to use energy: ${e.message}")
+                }
+            }
         }
 
         popupWindow?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), android.R.color.transparent))

@@ -45,7 +45,7 @@ fun PlayerStatusBar(
     gemImageResourceId: Int,
     gemCount: Int, // Use StateFlow for dynamic updates
     energyImageResourceId: Int,
-    energyCount: StateFlow<Int>, // Use StateFlow for dynamic updates
+    energyCount: Int, // Use StateFlow for dynamic updates
     bottomBorderColor: Color = Color(38, 137,181),
     bottomBorderSize: Dp = 1.5.dp
 ) {
@@ -91,9 +91,9 @@ fun PlayerStatusBar(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    val currentEnergyCount by energyCount.collectAsState(initial = 0) // for the future me if i want to add energy element in top bar this line should be removed because it create more ambigu
+//                    val currentEnergyCount by energyCount.collectAsState(initial = 0) // for the future me if i want to add energy element in top bar this line should be removed because it create more ambigu
                     Text(
-                        text = currentEnergyCount.toString(),
+                        text = energyCount.toString(),
                         color = Color.White,
                         style = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
                     )

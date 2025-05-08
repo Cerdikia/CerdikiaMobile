@@ -28,4 +28,14 @@ class StageViewModel(private val materiRepository: MateriRepository) : ViewModel
             }
         }
     }
+
+    fun useEnergy(email: String) {
+        viewModelScope.launch {
+            try {
+                materiRepository.useEnergy(email)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
