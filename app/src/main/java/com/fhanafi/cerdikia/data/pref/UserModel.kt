@@ -8,6 +8,7 @@ data class UserModel(
     val photoUrl: String? = null,
     val xp: Int = 0,
     val gems: Int = 0,
+    val energy: Int = 0,
     val completedMateriIds: Set<Int> = emptySet(),
     val accessToken: String = "",
     val refreshToken: String = ""

@@ -22,6 +22,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
                 photoUrl = preferences[PHOTO_URL_KEY] ?: "",
                 xp = preferences[XP_KEY] ?: 0,
                 gems = preferences[GEMS_KEY] ?: 0,
+                energy = preferences[ENERGY_KEY] ?: 0,
                 completedMateriIds = preferences[COMPLETED_MATERI_KEY]?.split(",")?.mapNotNull {
                     it.toIntOrNull()
                 }?.toSet() ?: emptySet(),
@@ -109,6 +110,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             preferences[KELAS_KEY] = user.kelas
             preferences[XP_KEY] = user.xp
             preferences[GEMS_KEY] = user.gems
+            preferences[ENERGY_KEY] = user.energy
             preferences[COMPLETED_MATERI_KEY] = user.completedMateriIds.joinToString(",")
         }
     }
@@ -128,6 +130,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         private val PHOTO_URL_KEY = stringPreferencesKey("photo_url")
         private val XP_KEY = intPreferencesKey("xp")
         private val GEMS_KEY = intPreferencesKey("gems")
+        private val ENERGY_KEY = intPreferencesKey("energy")
         private val COMPLETED_MATERI_KEY = stringPreferencesKey("completed_materi_ids")
         private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")

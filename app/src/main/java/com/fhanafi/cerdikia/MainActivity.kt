@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                                     gemImageResourceId = R.drawable.ic_gems,
                                     gemCount = userData.gems, // Use mainViewModel
                                     energyImageResourceId = R.drawable.ic_lighting,
-                                    energyCount = mainViewModel.playerEnergy // Use mainViewModel
+                                    energyCount = userData.energy // Use mainViewModel
                                 )
                             }
                         }
