@@ -28,6 +28,7 @@ class KelasActivity : AppCompatActivity() {
         enableEdgeToEdge()
         initialBinding()
         supportActionBar?.hide()
+        auth = FirebaseAuth.getInstance()
         viewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
         // Baca dari Intent
         val nama = intent.getStringExtra("EXTRA_NAMA") ?: ""
