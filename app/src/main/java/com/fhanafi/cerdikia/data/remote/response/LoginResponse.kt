@@ -28,6 +28,9 @@ data class Data(
 	@field:SerializedName("date_created")
 	val dateCreated: String? = null,
 
+	@field:SerializedName("image_profile")
+	val imageProfile: String? = null,
+
 	@field:SerializedName("id_kelas")
 	val idKelas: Int? = null,
 
