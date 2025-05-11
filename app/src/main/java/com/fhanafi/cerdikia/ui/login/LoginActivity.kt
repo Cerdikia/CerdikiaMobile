@@ -122,16 +122,14 @@ class LoginActivity : AppCompatActivity() {
 
                 try {
                     val response = authViewModel.login(email)
-                    // save photoUrl ke DataStore
-                    val user: FirebaseUser? = auth.currentUser
-                    user?.photoUrl?.toString()?.let { photoUrl ->
-                        authViewModel.savePhotoUrl(photoUrl)
-                    }
                     // Simpan hasil login ke DataStore
                     response.data?.let { data ->
                         val userModel = data.toUserModel()
                         authViewModel.saveUserData(userModel.nama, userModel.email, userModel.kelas) // nanti pindahin lagi karena ini hanya mencoba untuk menyatukan response APi agar tidak menggunakan authViewModel untuk save data user terpisah
                         authViewModel.saveUserTokens(userModel.accessToken, userModel.refreshToken)
+                        userModel.photoUrl?.let { photoUrl ->
+                            authViewModel.savePhotoUrl(photoUrl)
+                        }
                     }
 
                     Log.d("LoginActivity", "Response: $response")

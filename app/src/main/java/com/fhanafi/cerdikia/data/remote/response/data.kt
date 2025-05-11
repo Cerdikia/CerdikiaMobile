@@ -7,6 +7,7 @@ fun Data.toUserModel(): UserModel {
         email = this.email ?: "",
         nama = this.nama ?: "",
         kelas = this.idKelas ?: 0,
+        photoUrl = this.imageProfile,
         xp = 0, // default 0 saat login
         gems = 0, // default 0 saat login
         completedMateriIds = emptySet(), // default kosong saat login

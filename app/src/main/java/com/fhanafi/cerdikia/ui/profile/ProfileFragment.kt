@@ -1,12 +1,14 @@
 package com.fhanafi.cerdikia.ui.profile
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,7 @@ import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentProfileBinding
 import com.fhanafi.cerdikia.helper.SessionManager
+import com.fhanafi.cerdikia.helper.uriToFile
 import com.fhanafi.cerdikia.ui.splashscreen.SplashActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -34,6 +37,14 @@ class ProfileFragment : Fragment() {
     }
 
     private lateinit var googleSignInClient: com.google.android.gms.auth.api.signin.GoogleSignInClient
+    private val imagePicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                val file = uriToFile(it, requireContext())
+                val email = binding.editTextEmail.text.toString()
+                userViewModel.uploadProfileImage(email, file)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,6 +94,9 @@ class ProfileFragment : Fragment() {
         binding.btnKeluar.setOnClickListener {
             logout()
         }
+        binding.tvChangeProfile.setOnClickListener {
+            imagePicker.launch("image/*")
+        }
     }
 
     private fun logout() {
@@ -127,6 +141,9 @@ class ProfileFragment : Fragment() {
                     .circleCrop()
                     .into(binding.viewProfilePlaceholder)
             }
+        }
+        userViewModel.isUploading.observe(viewLifecycleOwner) { uploading ->
+            binding.progressBar.visibility = if (uploading) View.VISIBLE else View.GONE
         }
     }
 

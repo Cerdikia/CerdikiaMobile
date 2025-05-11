@@ -11,6 +11,7 @@ import com.fhanafi.cerdikia.data.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
@@ -18,6 +19,8 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private val _isUpdating = MutableLiveData<Boolean>()
     val isUpdating: LiveData<Boolean> = _isUpdating
+    private val _uploading = MutableLiveData<Boolean>()
+    val isUploading: LiveData<Boolean> = _uploading
 
     fun updateUserProfile(nama: String, email: String, kelas: Int) {
         viewModelScope.launch {
@@ -33,6 +36,19 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
                 e.printStackTrace()
             } finally {
                 _isUpdating.value = false
+            }
+        }
+    }
+
+    fun uploadProfileImage(email: String, imageFile: File) {
+        viewModelScope.launch {
+            _uploading.value = true
+            try {
+                userRepository.uploadProfileImage(email, imageFile)
+            } catch (e: Exception) {
+                Log.e("UserViewModel", "Upload failed: ${e.message}")
+            } finally {
+                _uploading.value = false
             }
         }
     }

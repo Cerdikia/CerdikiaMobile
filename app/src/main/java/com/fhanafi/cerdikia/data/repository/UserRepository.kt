@@ -5,9 +5,14 @@ import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.data.remote.request.LogsSiswaRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
+import com.fhanafi.cerdikia.data.remote.response.ChangeImageProfileResponse
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 class UserRepository(private val apiService: ApiService, private val userPreference: UserPreference) {
 
@@ -37,6 +42,14 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
         } else {
             throw Exception("UpdatePointResponse ${response.message}")
         }
+    }
+
+    suspend fun uploadProfileImage(email: String, imageFile: File): ChangeImageProfileResponse {
+        val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
+        val multipartBody = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+        val response = apiService.updateProfileImage(email, multipartBody)
+        response.imageProfile?.let { userPreference.savePhotoUrl(it) }
+        return response
     }
 
     suspend fun updateProfileFromApi(nama: String, email: String, kelas: Int): UserModel {
