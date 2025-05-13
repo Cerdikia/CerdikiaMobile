@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.fhanafi.cerdikia.data.pref";
+option java_multiple_files = true;
+
+message MisiHarianData {
+  int32 xpEarned = 1;
+  int32 quizzesCompleted = 2;
+  int32 minutesStudied = 3;
+  int64 lastResetTime = 4;
+  bool xpRewardClaimed = 5;
+  bool quizRewardClaimed = 6;
+  bool studyTimeRewardClaimed = 7;
+}

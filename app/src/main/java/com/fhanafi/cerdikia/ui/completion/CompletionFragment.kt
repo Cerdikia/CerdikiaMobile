@@ -14,9 +14,10 @@ import androidx.navigation.fragment.findNavController
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.databinding.FragmentCompletionBinding
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import com.fhanafi.cerdikia.ui.shop.ShopViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CompletionFragment : Fragment() {
@@ -25,6 +26,9 @@ class CompletionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by activityViewModels()
+    private val shopViewModel: ShopViewModel by activityViewModels {
+        ViewModelFactory.getInstance(requireContext())
+    }
     private var loadingDialog: LoadingDialogFragment? = null
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -54,7 +58,6 @@ class CompletionFragment : Fragment() {
         val isAlreadyCompleted = arguments?.getBoolean("isCompleted") ?: false
 
         binding.tvXp.text = "$xp"
-
         @Suppress("DEPRECATION")
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             userViewModel.userData.collect { user ->
@@ -73,6 +76,8 @@ class CompletionFragment : Fragment() {
 
                         viewLifecycleOwner.lifecycleScope.launch {
                             showLoading()
+                            shopViewModel.addXpEarned(xp)
+                            shopViewModel.incrementQuizCompleted()
                             // 1. Update via API (incrementing)
                             userViewModel.updatePointAndRefresh(
                                 xp = xp,

@@ -4,6 +4,18 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.protobuf)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.7"
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.builtins.create("java")
+        }
+    }
 }
 
 android {
@@ -82,6 +94,8 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom)) // Add BOM for Compose testing if needed
 
     implementation(libs.androidx.datastore.preferences)
+    implementation  (libs.androidx.datastore.core)
+    implementation(libs.protobuf.java)
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

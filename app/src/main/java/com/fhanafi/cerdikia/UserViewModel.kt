@@ -22,6 +22,16 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val _uploading = MutableLiveData<Boolean>()
     val isUploading: LiveData<Boolean> = _uploading
 
+    fun updateGemsFromMissionReward(gemsToAdd: Int) {
+        viewModelScope.launch {
+            try {
+                userRepository.updateGemsByQuest(gemsToAdd)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun updateUserProfile(nama: String, email: String, kelas: Int) {
         viewModelScope.launch {
             _isUpdating.value = false

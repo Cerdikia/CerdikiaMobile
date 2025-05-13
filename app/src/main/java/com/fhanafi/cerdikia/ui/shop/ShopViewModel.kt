@@ -1,13 +1,33 @@
 package com.fhanafi.cerdikia.ui.shop
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fhanafi.cerdikia.data.pref.MisiHarianData
+import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class ShopViewModel : ViewModel() {
+class ShopViewModel(
+    private val pref: MisiHarianPreference
+) : ViewModel() {
+    val dailyQuest = pref.questFlow
+        .stateIn(viewModelScope, SharingStarted.Lazily, MisiHarianData.getDefaultInstance())
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+    fun addXpEarned(xp: Int) = viewModelScope.launch { pref.addXpEarned(xp) }
+    fun incrementQuizCompleted() = viewModelScope.launch { pref.incrementQuizCompleted() }
+
+//    fun resetDailyQuest() {
+//        viewModelScope.launch {
+//            pref.resetQuests()
+//        }
+//    }
+
+    fun checkAndResetQuestIfNeeded() = viewModelScope.launch {
+        pref.checkAndResetIfNeeded()
     }
-    val text: LiveData<String> = _text
+
+    fun addStudyMinutes(minutes: Int) = viewModelScope.launch {
+        pref.addStudyMinutes(minutes)
+    }
 }
