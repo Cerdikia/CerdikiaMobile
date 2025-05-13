@@ -1,9 +1,11 @@
 package com.fhanafi.cerdikia
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fhanafi.cerdikia.data.database.AppDatabase
+import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
 import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.data.pref.dataStore
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
@@ -16,6 +18,7 @@ import com.fhanafi.cerdikia.ui.home.HomeViewModel
 import com.fhanafi.cerdikia.ui.login.AuthViewModel
 import com.fhanafi.cerdikia.ui.question.SoalViewModel
 import com.fhanafi.cerdikia.ui.rangking.RangkingViewModel
+import com.fhanafi.cerdikia.ui.shop.ShopViewModel
 import com.fhanafi.cerdikia.ui.stage.StageViewModel
 
 object ViewModelFactory : ViewModelProvider.Factory {
@@ -25,6 +28,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
     private lateinit var rangkingRepository: RangkingRepository
     private lateinit var mapelRepository: MapelRepository
     private lateinit var materiRepository: MateriRepository
+    @SuppressLint("StaticFieldLeak")
+    private lateinit var misiHarianPreference: MisiHarianPreference
 
     private fun initRepositories(context: Context) {
         val pref = UserPreference.getInstance(context.dataStore)
@@ -46,6 +51,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
         }
         if(!::materiRepository.isInitialized){
             materiRepository = MateriRepository(apiService)
+        }
+        if (!::misiHarianPreference.isInitialized) {
+            misiHarianPreference = MisiHarianPreference(context)
         }
     }
 
@@ -74,6 +82,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(SoalViewModel::class.java) -> {
                 SoalViewModel(materiRepository) as T
+            }
+            modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
+                ShopViewModel(misiHarianPreference) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

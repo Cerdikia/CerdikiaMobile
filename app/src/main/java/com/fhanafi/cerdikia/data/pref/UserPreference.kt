@@ -32,9 +32,8 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
         }
     }
 
-    suspend fun updateXpAndGems(xp: Int, gems: Int) {
+    suspend fun updateGems(gems: Int) {
         dataStore.edit { preferences ->
-            preferences[XP_KEY] = xp
             preferences[GEMS_KEY] = gems
         }
     }

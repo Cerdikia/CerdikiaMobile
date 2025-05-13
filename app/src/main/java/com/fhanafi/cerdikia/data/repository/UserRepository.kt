@@ -143,6 +143,38 @@ class UserRepository(private val apiService: ApiService, private val userPrefere
         }
     }
 
+    suspend fun updateGemsByQuest(gemsToAdd: Int): Boolean {
+        return try {
+            val currentUser = userPreference.getUserData().first()
+            val currentGems = currentUser.gems
+            val email = currentUser.email
+
+            if (email.isNullOrBlank()) {
+                throw IllegalStateException("User email not found in preferences")
+            }
+
+            val updatedGems = currentGems + gemsToAdd
+
+            val request = UpdatePointRequest(
+                email = email,
+                diamond = updatedGems,
+                exp = currentUser.xp // keep XP the same
+            )
+
+            val response = apiService.updatePoint(request)
+
+            if (response.message == "User point updated") {
+                userPreference.updateGems(updatedGems)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: UserRepository? = null

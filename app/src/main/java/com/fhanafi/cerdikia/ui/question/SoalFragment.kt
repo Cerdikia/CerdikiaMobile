@@ -17,13 +17,19 @@ import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentSoalBinding
 import com.fhanafi.cerdikia.helper.stripHtmlTags
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import com.fhanafi.cerdikia.ui.shop.ShopViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class SoalFragment : Fragment() {
 
     private val viewModel: SoalViewModel by activityViewModels{
+        ViewModelFactory.getInstance(requireContext())
+    }
+    private val shopViewModel: ShopViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
     private var _binding: FragmentSoalBinding? = null
@@ -33,6 +39,8 @@ class SoalFragment : Fragment() {
     private var isCompleted: Boolean = false
     private lateinit var answerOptionAdapter: AnswerOptionAdapter
     private var loadingDialog: LoadingDialogFragment? = null
+    private var studyJob: Job? = null
+    private val studyInterval = 60_000L // 1 minute
 
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -234,6 +242,30 @@ class SoalFragment : Fragment() {
         } else {
             binding.progressSoal.progress = 0 // Set ke 0 kalau belum ada data
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        startStudyTracking()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopStudyTracking()
+    }
+
+    private fun startStudyTracking() {
+        studyJob = lifecycleScope.launch {
+            while (isActive) {
+                delay(studyInterval)
+                // Save 1 minute of study time
+                shopViewModel.addStudyMinutes(1)
+            }
+        }
+    }
+
+    private fun stopStudyTracking() {
+        studyJob?.cancel()
+        studyJob = null
     }
 
     override fun onDestroy() {
