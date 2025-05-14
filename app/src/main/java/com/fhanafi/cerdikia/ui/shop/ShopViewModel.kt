@@ -4,30 +4,67 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.MisiHarianData
 import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
+import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
+import com.fhanafi.cerdikia.data.repository.ShopRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ShopViewModel(
-    private val pref: MisiHarianPreference
+    private val shopRepository: ShopRepository
 ) : ViewModel() {
-    val dailyQuest = pref.questFlow
-        .stateIn(viewModelScope, SharingStarted.Lazily, MisiHarianData.getDefaultInstance())
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun addXpEarned(xp: Int) = viewModelScope.launch { pref.addXpEarned(xp) }
-    fun incrementQuizCompleted() = viewModelScope.launch { pref.incrementQuizCompleted() }
+    val dailyQuest = shopRepository.questFlow
+        .stateIn(viewModelScope, SharingStarted.Lazily, shopRepository.getDefaultQuestData())
 
-//    fun resetDailyQuest() {
-//        viewModelScope.launch {
-//            pref.resetQuests()
-//        }
-//    }
+    val hadiahList: StateFlow<List<HadiahDataItem>> = shopRepository.gifts
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun loadHadiahList() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try{
+                delay(5000) // walaupun sudah terdelay karena ada observe daily quest local jadi bentrok loading state nya dan kemungkinan loading state hadiah true karena daily quest local telah tersajikan data local nya
+                shopRepository.loadGifts()
+            }catch (e: Exception){
+                e.printStackTrace()
+            }finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun addXpEarned(xp: Int) = viewModelScope.launch {
+        shopRepository.addXpEarned(xp)
+    }
+
+    fun incrementQuizCompleted() = viewModelScope.launch {
+        shopRepository.incrementQuizCompleted()
+    }
 
     fun checkAndResetQuestIfNeeded() = viewModelScope.launch {
-        pref.checkAndResetIfNeeded()
+        shopRepository.checkAndResetIfNeeded()
     }
 
     fun addStudyMinutes(minutes: Int) = viewModelScope.launch {
-        pref.addStudyMinutes(minutes)
+        shopRepository.addStudyMinutes(minutes)
     }
+
+    fun setXpRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        shopRepository.setXpRewardClaimed(claimed)
+    }
+
+    fun setQuizRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        shopRepository.setQuizRewardClaimed(claimed)
+    }
+
+    fun setStudyTimeRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        shopRepository.setStudyTimeRewardClaimed(claimed)
+    }
+
 }
