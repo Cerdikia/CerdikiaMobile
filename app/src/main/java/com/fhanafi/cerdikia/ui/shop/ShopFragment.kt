@@ -14,17 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
+import android.util.Log
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.helper.DailyQuestUtils
+import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
 
-class ShopFragment : Fragment() {
+class ShopFragment : Fragment(), OnShopItemInteractionListener {
 
     private var _binding: FragmentShopBinding? = null
     private val binding get() = _binding
-    private var xpRewardClaimed = false
-    private var quizRewardClaimed = false
-    private var studyTimeRewardClaimed = false
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
@@ -41,10 +40,6 @@ class ShopFragment : Fragment() {
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
         val root: View = binding!!.root
-        // In your Fragment/Adapter
-        // Get a reference to the RecyclerView from the binding
-//        val recyclerViewMisi = binding.recyclerViewMisi
-//        recyclerViewMisi.layoutManager = LinearLayoutManager(requireContext())
 
         val recycleViewToko = binding!!.recyclerViewToko
         recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -57,17 +52,31 @@ class ShopFragment : Fragment() {
             // Add more toko items here if needed
         )
 
-        val adapterToko = TokoAdapter(tokoItems)
+        val adapterToko = TokoAdapter(tokoItems, this)
         recycleViewToko.adapter = adapterToko
 
-//        adapter = MisiHarianAdapter()
-//        binding.recyclerViewMisi.adapter = adapter
-//        binding.recyclerViewMisi.layoutManager = LinearLayoutManager(requireContext())
         shopViewModel.checkAndResetQuestIfNeeded()
         observeDailyQuest()
         onBackButtonPressed()
         return root
     }
+    // Implement the methods from OnShopItemInteractionListener
+    // Implement the methods from OnShopItemInteractionListener
+    private fun updateExchangeButtonVisibility() {
+        val adapter = binding?.recyclerViewToko?.adapter as? TokoAdapter
+        val isAnyItemSelected = adapter?.itemCountsRv?.any { it.value > 0 } ?: false
+        binding?.buttonTukarkan?.visibility = if (isAnyItemSelected) View.VISIBLE else View.GONE
+        binding?.buttonBatal?.visibility = if (isAnyItemSelected) View.VISIBLE else View.GONE
+    }
+
+    override fun onItemBought(item: Toko) {
+        updateExchangeButtonVisibility()
+    }
+
+    override fun onItemCountChanged(item: Toko, quantity: Int) {
+        updateExchangeButtonVisibility()
+    }
+
 
     private fun observeDailyQuest() {
         lifecycleScope.launch {
@@ -90,9 +99,9 @@ class ShopFragment : Fragment() {
                     "${quest.xpEarned} / 50"
                 }
 
-                if (quest.xpEarned >= 50 && !xpRewardClaimed) {
+                if (quest.xpEarned >= 50 && !quest.xpRewardClaimed) {
                     userViewModel.updateGemsFromMissionReward(10)
-                    xpRewardClaimed = true
+                    shopViewModel.setXpRewardClaimed(true)
                 }
 
                 // Quiz Mission
@@ -103,12 +112,10 @@ class ShopFragment : Fragment() {
                 } else {
                     "${quest.quizzesCompleted} / 2"
                 }
-
-                if (quest.quizzesCompleted >= 2 && !quizRewardClaimed) {
+                if (quest.quizzesCompleted >= 2 && !quest.quizRewardClaimed) {
                     userViewModel.updateGemsFromMissionReward(5)
-                    quizRewardClaimed = true
+                    shopViewModel.setQuizRewardClaimed(true)
                 }
-
                 // Study Time Mission
                 currentBinding.progressTime.max = 30
                 currentBinding.progressTime.progress = quest.minutesStudied
@@ -118,9 +125,9 @@ class ShopFragment : Fragment() {
                     "${quest.minutesStudied} / 30"
                 }
 
-                if (quest.minutesStudied >= 30 && !studyTimeRewardClaimed) {
+                if (quest.minutesStudied >= 30 && !quest.studyTimeRewardClaimed) {
                     userViewModel.updateGemsFromMissionReward(10)
-                    studyTimeRewardClaimed = true
+                    shopViewModel.setStudyTimeRewardClaimed(true)
                 }
             }
         }

@@ -30,4 +30,17 @@ class ShopViewModel(
     fun addStudyMinutes(minutes: Int) = viewModelScope.launch {
         pref.addStudyMinutes(minutes)
     }
+
+    fun setXpRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        pref.setXpRewardClaimed(claimed)
+    }
+
+    fun setQuizRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        pref.setQuizRewardClaimed(claimed)
+    }
+
+    fun setStudyTimeRewardClaimed(claimed: Boolean) = viewModelScope.launch {
+        pref.setStudyTimeRewardClaimed(claimed)
+    }
+
 }

@@ -5,17 +5,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
 
-class TokoAdapter(private val tokoList: List<Toko>) :
+class TokoAdapter(
+    private val tokoList: List<Toko>,
+    private val listener: OnShopItemInteractionListener? = null
+) :
     RecyclerView.Adapter<TokoAdapter.TokoViewHolder>(){
 
+    private val itemCounts = mutableMapOf<Int, Int>() // To store the count for each item
+    val itemCountsRv = itemCounts
     class TokoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val iconImageView: ImageView = itemView.findViewById(R.id.img_shopAsset)
         val priceTextView: TextView = itemView.findViewById(R.id.tv_shopPrice)
+        val gemsImageView: ImageView = itemView.findViewById(R.id.img_shopGems)
         val buyButton: Button = itemView.findViewById(R.id.btn_shop)
+        val quantityLayout: LinearLayout = itemView.findViewById(R.id.layout_quantity)
+        val decrementButton: Button = itemView.findViewById(R.id.btn_decrement)
+        val incrementButton: Button = itemView.findViewById(R.id.btn_increment)
+        val itemCountTextView: TextView = itemView.findViewById(R.id.tv_itemCount)
 
     }
 
@@ -30,11 +43,52 @@ class TokoAdapter(private val tokoList: List<Toko>) :
         holder.iconImageView.setImageResource(currentToko.imgResourceId)
         holder.priceTextView.text = currentToko.price.toString()
 
-        holder.buyButton.setOnClickListener {
-            // Handle the purchase action here
-            val clickedItem = tokoList[position]
-            // For example:
-            // Toast.makeText(holder.itemView.context, "Membeli ${clickedItem.price} Gems", Toast.LENGTH_SHORT).show()
+        if (itemCounts.containsKey(position)) {
+            // Item has been "bought" (button clicked)
+            holder.buyButton.visibility = View.GONE
+            holder.quantityLayout.visibility = View.VISIBLE
+            holder.priceTextView.visibility = View.GONE
+            holder.gemsImageView.visibility = View.GONE
+            holder.itemCountTextView.text = itemCounts[position].toString()
+        } else {
+            // Initial state
+            holder.buyButton.visibility = View.VISIBLE
+            holder.quantityLayout.visibility = View.GONE
+            holder.priceTextView.visibility = View.VISIBLE
+            holder.gemsImageView.visibility = View.VISIBLE
+            holder.buyButton.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white)) // Set text color to white
+            holder.buyButton.setOnClickListener {
+                itemCounts[position] = 1
+                notifyItemChanged(position) // Rebind to show +/-
+                listener?.onItemBought(currentToko)
+                // Handle the initial "buy" action (e.g., check gems)
+                // Toast.makeText(holder.itemView.context, "Added 1 item", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        holder.decrementButton.setOnClickListener {
+            val currentCount = itemCounts[position] ?: 1
+            if (currentCount > 1) {
+                itemCounts[position] = currentCount - 1
+                holder.itemCountTextView.text = (currentCount - 1).toString()
+                listener?.onItemCountChanged(currentToko, currentCount - 1) // Notify the fragment
+            } else {
+                // Revert to the "Beli" button
+                itemCounts.remove(position)
+                notifyItemChanged(position) // Rebind to show "Beli"
+                listener?.onItemCountChanged(currentToko, 0) // Notify the fragment
+            }
+            // Handle decrement logic (e.g., updating cart)
+            // Toast.makeText(holder.itemView.context, "Decremented item", Toast.LENGTH_SHORT).show()
+        }
+
+        holder.incrementButton.setOnClickListener {
+            val currentCount = itemCounts[position] ?: 0
+            itemCounts[position] = currentCount + 1
+            holder.itemCountTextView.text = (currentCount + 1).toString()
+            listener?.onItemCountChanged(currentToko, currentCount + 1) // Notify the fragment
+            // Handle increment logic (e.g., adding to cart)
+            // Toast.makeText(holder.itemView.context, "Incremented item", Toast.LENGTH_SHORT).show()
         }
     }
 
