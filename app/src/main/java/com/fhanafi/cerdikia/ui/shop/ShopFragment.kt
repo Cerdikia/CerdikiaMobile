@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
-import android.util.Log
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
+import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.DailyQuestUtils
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
+import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ShopFragment : Fragment(), OnShopItemInteractionListener {
 
@@ -31,7 +34,19 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         ViewModelFactory.getInstance(requireContext())
     }
     private var countDownTimer: CountDownTimer? = null
+    private var loadingDialog: LoadingDialogFragment? = null
 
+    private fun showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialogFragment()
+            loadingDialog?.show(parentFragmentManager, "loading")
+        }
+    }
+
+    private fun hideLoading() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,27 +55,14 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
         val root: View = binding!!.root
-
-        val recycleViewToko = binding!!.recyclerViewToko
-        recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        val tokoItems = listOf(
-            Toko(R.drawable.img_pencil, 1000),
-            Toko(R.drawable.img_pencil, 1000),
-            Toko(R.drawable.img_pencil, 1000),
-            Toko(R.drawable.img_pencil, 1000),
-            // Add more toko items here if needed
-        )
-
-        val adapterToko = TokoAdapter(tokoItems, this)
-        recycleViewToko.adapter = adapterToko
-
+        observeLoadingState()
+        shopViewModel.loadHadiahList()
         shopViewModel.checkAndResetQuestIfNeeded()
         observeDailyQuest()
+        observeHadiahList()
         onBackButtonPressed()
         return root
     }
-    // Implement the methods from OnShopItemInteractionListener
     // Implement the methods from OnShopItemInteractionListener
     private fun updateExchangeButtonVisibility() {
         val adapter = binding?.recyclerViewToko?.adapter as? TokoAdapter
@@ -69,14 +71,30 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         binding?.buttonBatal?.visibility = if (isAnyItemSelected) View.VISIBLE else View.GONE
     }
 
-    override fun onItemBought(item: Toko) {
+    override fun onItemBought(item: HadiahDataItem) {
         updateExchangeButtonVisibility()
     }
 
-    override fun onItemCountChanged(item: Toko, quantity: Int) {
+    override fun onItemCountChanged(item: HadiahDataItem, quantity: Int) {
         updateExchangeButtonVisibility()
     }
 
+    private fun observeHadiahList() {
+        val recycleViewToko = binding!!.recyclerViewToko
+        recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        // Observe the list of gifts from ShopViewModel
+        shopViewModel.hadiahList.onEach { tokoList ->
+            // Update RecyclerView adapter with the new list of gifts
+            val adapterToko = TokoAdapter(tokoList, this)
+            recycleViewToko.adapter = adapterToko
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeLoadingState() {
+        shopViewModel.isLoading.onEach { isLoading ->
+            if (isLoading) showLoading() else hideLoading()
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
 
     private fun observeDailyQuest() {
         lifecycleScope.launch {

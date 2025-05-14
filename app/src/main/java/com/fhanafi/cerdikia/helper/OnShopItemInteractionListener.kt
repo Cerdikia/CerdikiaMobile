@@ -1,8 +1,8 @@
 package com.fhanafi.cerdikia.helper
 
-import com.fhanafi.cerdikia.ui.shop.Toko
+import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 
 interface OnShopItemInteractionListener {
-    fun onItemBought(item: Toko) // Called when the "Beli" button is clicked (first time)
-    fun onItemCountChanged(item: Toko, quantity: Int) // Called when increment/decrement buttons are clicked
+    fun onItemBought(item: HadiahDataItem) // Called when the "Beli" button is clicked (first time)
+    fun onItemCountChanged(item: HadiahDataItem, quantity: Int) // Called when increment/decrement buttons are clicked
 }

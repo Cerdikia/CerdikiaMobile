@@ -13,6 +13,7 @@ import com.fhanafi.cerdikia.data.repository.AuthRepository
 import com.fhanafi.cerdikia.data.repository.MapelRepository
 import com.fhanafi.cerdikia.data.repository.MateriRepository
 import com.fhanafi.cerdikia.data.repository.RangkingRepository
+import com.fhanafi.cerdikia.data.repository.ShopRepository
 import com.fhanafi.cerdikia.data.repository.UserRepository
 import com.fhanafi.cerdikia.ui.home.HomeViewModel
 import com.fhanafi.cerdikia.ui.login.AuthViewModel
@@ -28,6 +29,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
     private lateinit var rangkingRepository: RangkingRepository
     private lateinit var mapelRepository: MapelRepository
     private lateinit var materiRepository: MateriRepository
+    private lateinit var shopRepository: ShopRepository
     @SuppressLint("StaticFieldLeak")
     private lateinit var misiHarianPreference: MisiHarianPreference
 
@@ -54,6 +56,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
         }
         if (!::misiHarianPreference.isInitialized) {
             misiHarianPreference = MisiHarianPreference(context)
+        }
+        if (!::shopRepository.isInitialized) {
+            shopRepository = ShopRepository.getInstance(apiService, misiHarianPreference)
         }
     }
 
@@ -83,8 +88,11 @@ object ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(SoalViewModel::class.java) -> {
                 SoalViewModel(materiRepository) as T
             }
+//            modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
+//                ShopViewModel(misiHarianPreference) as T
+//            }
             modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
-                ShopViewModel(misiHarianPreference) as T
+                ShopViewModel(shopRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

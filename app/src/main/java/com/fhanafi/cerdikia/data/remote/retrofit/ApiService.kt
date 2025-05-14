@@ -11,6 +11,7 @@ import com.fhanafi.cerdikia.data.remote.response.GetEnergyResponse
 import com.fhanafi.cerdikia.data.remote.response.GetMapelResponse
 import com.fhanafi.cerdikia.data.remote.response.GetMateriResponse
 import com.fhanafi.cerdikia.data.remote.response.GetPointResponse
+import com.fhanafi.cerdikia.data.remote.response.ListHadiahResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.remote.response.LogsSiswaResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
@@ -108,4 +109,8 @@ interface ApiService {
     suspend fun useEnergy(
         @Path("email") email: String
     ): UseEnergyResponse
+
+    @GET("gifts")
+    suspend fun getGifts(
+    ): ListHadiahResponse
 }

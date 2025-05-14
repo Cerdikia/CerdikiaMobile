@@ -7,13 +7,17 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.fhanafi.cerdikia.R
+import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
 
 class TokoAdapter(
-    private val tokoList: List<Toko>,
+    private val tokoList: List<HadiahDataItem>,
     private val listener: OnShopItemInteractionListener? = null
 ) :
     RecyclerView.Adapter<TokoAdapter.TokoViewHolder>(){
@@ -40,8 +44,12 @@ class TokoAdapter(
 
     override fun onBindViewHolder(holder: TokoViewHolder, position: Int) {
         val currentToko = tokoList[position]
-        holder.iconImageView.setImageResource(currentToko.imgResourceId)
-        holder.priceTextView.text = currentToko.price.toString()
+        Glide.with(holder.itemView.context)
+            .load(currentToko.img ?: "") // fallback to empty URL if null
+            .apply(RequestOptions().override(85, 85).fitCenter()) // Or .centerCrop()
+            .into(holder.iconImageView)
+
+        holder.priceTextView.text = currentToko.diamond.toString()
 
         if (itemCounts.containsKey(position)) {
             // Item has been "bought" (button clicked)
@@ -62,7 +70,6 @@ class TokoAdapter(
                 notifyItemChanged(position) // Rebind to show +/-
                 listener?.onItemBought(currentToko)
                 // Handle the initial "buy" action (e.g., check gems)
-                // Toast.makeText(holder.itemView.context, "Added 1 item", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -79,24 +86,27 @@ class TokoAdapter(
                 listener?.onItemCountChanged(currentToko, 0) // Notify the fragment
             }
             // Handle decrement logic (e.g., updating cart)
-            // Toast.makeText(holder.itemView.context, "Decremented item", Toast.LENGTH_SHORT).show()
         }
 
         holder.incrementButton.setOnClickListener {
             val currentCount = itemCounts[position] ?: 0
-            itemCounts[position] = currentCount + 1
-            holder.itemCountTextView.text = (currentCount + 1).toString()
-            listener?.onItemCountChanged(currentToko, currentCount + 1) // Notify the fragment
-            // Handle increment logic (e.g., adding to cart)
-            // Toast.makeText(holder.itemView.context, "Incremented item", Toast.LENGTH_SHORT).show()
+            val maxCount = currentToko.jumlah ?: Int.MAX_VALUE // fallback in case jumlah is null
+
+            if (currentCount < maxCount) {
+                itemCounts[position] = currentCount + 1
+                holder.itemCountTextView.text = (currentCount + 1).toString()
+                listener?.onItemCountChanged(currentToko, currentCount + 1)
+            } else {
+                // Optional: You can show a toast or visual feedback
+                Toast.makeText(
+                    holder.itemView.context,
+                    "Maksimal jumlah pembelian adalah $maxCount",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
     override fun getItemCount() = tokoList.size
 
 }
-
-data class Toko(
-    val imgResourceId: Int,
-    val price: Int
-)
