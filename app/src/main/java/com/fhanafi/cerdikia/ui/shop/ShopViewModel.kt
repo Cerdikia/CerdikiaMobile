@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.MisiHarianData
 import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
+import com.fhanafi.cerdikia.data.remote.response.EmailVerifResponse
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
+import com.fhanafi.cerdikia.data.remote.response.VerifData
 import com.fhanafi.cerdikia.data.repository.ShopRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +38,25 @@ class ShopViewModel(
             }finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private val _verifData = MutableStateFlow<VerifData?>(null)
+    val verifData: StateFlow<VerifData?> = _verifData
+
+    fun fetchVerifiedStatus() {
+        viewModelScope.launch {
+            _verifData.value = shopRepository.getVerifiedStatus()
+        }
+    }
+
+    private val _emailVerifResult = MutableStateFlow<Result<EmailVerifResponse>?>(null)
+    val emailVerifResult: StateFlow<Result<EmailVerifResponse>?> = _emailVerifResult
+
+    fun sendEmailVerification() {
+        viewModelScope.launch {
+            val result = shopRepository.sendEmailVerification()
+            _emailVerifResult.value = result
         }
     }
 

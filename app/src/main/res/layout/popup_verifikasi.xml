@@ -43,21 +43,42 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Akun kamu sedang menunggu\nproses verifikasi. Mohon\ntunggu sebentar ya."
+                    android:text="@string/verifikasi_sekarang"
                     android:textColor="@color/black"
                     android:textStyle="bold"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_verifikasi"
+                    />
+
+                <Button
+                    android:id="@+id/btn_verifikasi"
+                    android:layout_width="0dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/blueMain"
+                    android:text="Verifikasi Akun"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewMessage"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
+                android:id="@+id/img_kucing"
                 android:layout_width="50dp"
                 android:layout_height="80dp"
                 android:layout_marginTop="86dp"
                 android:src="@drawable/ic_kucing"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent" />
         </androidx.cardview.widget.CardView>
 

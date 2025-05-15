@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
+import android.widget.Toast
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
@@ -58,8 +59,10 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         observeLoadingState()
         shopViewModel.loadHadiahList()
         shopViewModel.checkAndResetQuestIfNeeded()
+        shopViewModel.fetchVerifiedStatus() // <- Fetch verified status
+        observeVerifiedStatus()             // <- Observe and wait before loading adapter
         observeDailyQuest()
-        observeHadiahList()
+//        observeHadiahList()
         onBackButtonPressed()
         return root
     }
@@ -79,20 +82,38 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         updateExchangeButtonVisibility()
     }
 
-    private fun observeHadiahList() {
+    override fun onVerifikasiClicked() {
+        // Example: navigate to verification screen
+        shopViewModel.sendEmailVerification()
+        Toast.makeText(requireContext(), "Email verifikasi telah dikirim ulang.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun observeHadiahList(verifiedStatus: String) {
         val recycleViewToko = binding!!.recyclerViewToko
         recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        // Observe the list of gifts from ShopViewModel
+
         shopViewModel.hadiahList.onEach { tokoList ->
-            // Update RecyclerView adapter with the new list of gifts
-            val adapterToko = TokoAdapter(tokoList, this)
-            recycleViewToko.adapter = adapterToko
+            val adapter = TokoAdapter(
+                tokoList,
+                listener = this@ShopFragment, // you already implement OnShopItemInteractionListener
+                verifiedStatus = verifiedStatus,
+                fragmentManager = childFragmentManager
+            )
+            recycleViewToko.adapter = adapter
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
+
 
     private fun observeLoadingState() {
         shopViewModel.isLoading.onEach { isLoading ->
             if (isLoading) showLoading() else hideLoading()
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVerifiedStatus() {
+        shopViewModel.verifData.onEach { verifData ->
+            val verifiedStatus = verifData?.verifiedStatus ?: "unknown" // handle nulls
+            observeHadiahList(verifiedStatus)
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

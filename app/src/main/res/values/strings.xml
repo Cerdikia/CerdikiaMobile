@@ -19,4 +19,6 @@
     <string name="kelas_kosong">Kelas Kosong</string>
     <string name="web_client_id">698707798052-de2742d61vnsfppvsl78455dvi0bhije.apps.googleusercontent.com</string>
     <string name="foto_profile">Foto Profile</string>
+    <string name="tunggu_verifikasi">Akun kamu sedang menunggu\nproses verifikasi. Mohon\ntunggu sebentar ya.</string>
+    <string name="verifikasi_sekarang">Verifikasi akun dulu ya, supaya bisa tukar hadiah</string>
 </resources>
