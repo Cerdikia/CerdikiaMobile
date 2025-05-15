@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.StateFlow
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerStatusBar(
-    flagResourceId: StateFlow<Int>, // Use StateFlow for dynamic updates
+    flagResourceId: Int, // Use StateFlow for dynamic updates
     gemImageResourceId: Int,
     gemCount: Int, // Use StateFlow for dynamic updates
     energyImageResourceId: Int,
@@ -57,9 +57,9 @@ fun PlayerStatusBar(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 // Flag
-                val currentFlag by flagResourceId.collectAsState(initial = R.drawable.ic_flag) // Provide a default subject as english course
+//                val currentFlag by flagResourceId.collectAsState(initial = R.drawable.ic_indoflag) // Provide a default subject as english course
                 Image(
-                    painter = painterResource(id = currentFlag),
+                    painter = painterResource(id = flagResourceId),
                     contentDescription = "Player Flag",
                     modifier = Modifier.size(48.dp)
                 )
