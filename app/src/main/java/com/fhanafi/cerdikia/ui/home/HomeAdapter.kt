@@ -36,8 +36,14 @@ class  HomeAdapter(private val itemList: List<MapelEntity>) :
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
             val idMapel = currentItem.id_mapel // From your API response
+            val namaMapel = currentItem.nama_mapel
+            val description = MapelDescriptionHelper.getDescription(namaMapel)
+
             val bundle = Bundle().apply {
                 putInt("idMapel", idMapel) // Pass this to StageFragment
+                putString("namaMapel", namaMapel)
+                putString("description", description)
+
             }
             holder.itemView.findNavController().navigate(R.id.action_navigation_home_to_stageFragment, bundle)
         }

@@ -78,9 +78,29 @@ class StageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Get arguments passed from HomeAdapter
+        val namaMapel = arguments?.getString("namaMapel") ?: "Materi Title"
+        val description = arguments?.getString("description") ?: "Materi Description"
+
+        // Set them to the TextViews
+        binding.textMateriTitle.text = namaMapel
+        binding.textMateriDescription.text = description
+
         parentFragmentManager.setFragmentResultListener("requestKey", viewLifecycleOwner) { _, bundle ->
             val newIdMapel = bundle.getInt("idMapel", -1)
 //            Log.d("StageFragment", "Received via FragmentResult: $newIdMapel")
+            val newNamaMapel = bundle.getString("namaMapel")
+            val newDescription = bundle.getString("description")
+
+            if (!newNamaMapel.isNullOrEmpty()) {
+                binding.textMateriTitle.text = newNamaMapel
+            }
+            if (!newDescription.isNullOrEmpty()) {
+                binding.textMateriDescription.text = newDescription
+            }
+
             if (newIdMapel != -1) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     userViewModel.userData.collectLatest { user ->
