@@ -1,10 +1,13 @@
 package com.fhanafi.cerdikia.ui.stage
 
-import androidx.fragment.app.viewModels
+import android.app.AlertDialog
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.util.TypedValue
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +18,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
@@ -23,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
-import androidx.navigation.fragment.findNavController
+import com.fhanafi.cerdikia.helper.calculateRemainingTimeMillis
 import com.fhanafi.cerdikia.databinding.FragmentStageBinding
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import kotlinx.coroutines.delay
@@ -55,7 +57,6 @@ class StageFragment : Fragment() {
         loadingDialog?.dismiss()
         loadingDialog = null
     }
-    //TODO: buat arrow_up dan judul dari materi yang diperlihatkan yang berfungsi untuk menclose recycleView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -66,7 +67,7 @@ class StageFragment : Fragment() {
         val recyclerView = binding.recyclerViewMateri
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val idMapel = arguments?.getInt("idMapel") ?: -1
-        Log.d("StageFragment", "Received idMapel StageFragment: $idMapel")
+//        Log.d("StageFragment", "Received idMapel StageFragment: $idMapel")
         adapter = MateriAdapter(emptyList()) { clickedView, materiItem ->
             showPopupModul(clickedView, materiItem.title, materiItem.description, materiItem.id, idMapel, materiItem.isCompleted)
         }
@@ -77,9 +78,29 @@ class StageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Get arguments passed from HomeAdapter
+        val namaMapel = arguments?.getString("namaMapel") ?: "Materi Title"
+        val description = arguments?.getString("description") ?: "Materi Description"
+
+        // Set them to the TextViews
+        binding.textMateriTitle.text = namaMapel
+        binding.textMateriDescription.text = description
+
         parentFragmentManager.setFragmentResultListener("requestKey", viewLifecycleOwner) { _, bundle ->
             val newIdMapel = bundle.getInt("idMapel", -1)
-            Log.d("StageFragment", "Received via FragmentResult: $newIdMapel")
+//            Log.d("StageFragment", "Received via FragmentResult: $newIdMapel")
+            val newNamaMapel = bundle.getString("namaMapel")
+            val newDescription = bundle.getString("description")
+
+            if (!newNamaMapel.isNullOrEmpty()) {
+                binding.textMateriTitle.text = newNamaMapel
+            }
+            if (!newDescription.isNullOrEmpty()) {
+                binding.textMateriDescription.text = newDescription
+            }
+
             if (newIdMapel != -1) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     userViewModel.userData.collectLatest { user ->
@@ -155,27 +176,72 @@ class StageFragment : Fragment() {
             popupWindow?.dismiss()
             popupWindow = null
 
-            val bundle = Bundle().apply {
-                putInt("materiId", materiId)
-                putInt("idMapel", idMapel)
-                putBoolean("isCompleted", isCompleted)
-            }
-
             lifecycleScope.launch {
                 val user = userViewModel.userData.first()
-                try {
-                    viewModel.useEnergy(user.email)
-                    userViewModel.refreshPointData()
-                    requireView().findNavController()
-                        .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
-                } catch (e: Exception) {
-                    Log.e("StageFragment", "Failed to use energy: ${e.message}")
+
+                if (user.energy <= 0) {
+                    val energyData = viewModel.getEnergy(user.email)
+                    val remainingMillis = calculateRemainingTimeMillis(energyData?.lastUpdated)
+                    showEnergyDepletedPopup(remainingMillis)
+                } else {
+                    try {
+                        viewModel.useEnergy(user.email)
+                        userViewModel.refreshPointData()
+
+                        val bundle = Bundle().apply {
+                            putInt("materiId", materiId)
+                            putInt("idMapel", idMapel)
+                            putBoolean("isCompleted", isCompleted)
+                        }
+
+                        requireView().findNavController()
+                            .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
+                    } catch (e: Exception) {
+                        Log.e("StageFragment", "Failed to use energy: ${e.message}")
+                    }
                 }
             }
         }
 
         popupWindow?.setBackgroundDrawable(ContextCompat.getDrawable(requireContext(), android.R.color.transparent))
         popupWindow?.showAsDropDown(anchorView, -250, 8)
+    }
+
+    private fun showEnergyDepletedPopup(remainingMillis: Long) {
+        val dialog = Dialog(requireContext())
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_energy, null)
+        dialog.setContentView(dialogView)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(false)
+
+        val timerTextView = dialogView.findViewById<TextView>(R.id.tvMessageTimer)
+        val closeBtn = dialogView.findViewById<TextView>(R.id.textViewClose)
+
+        val countDownTimer = object : CountDownTimer(remainingMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                dialog.dismiss()
+            }
+        }
+
+        countDownTimer.start()
+
+        closeBtn.setOnClickListener {
+            countDownTimer.cancel()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        val widthInPx = (310 * resources.displayMetrics.density).toInt()
+        val heightInPx = (197 * resources.displayMetrics.density).toInt()
+        dialog.window?.setLayout(widthInPx, heightInPx)
+
     }
 
     override fun onDestroyView() {

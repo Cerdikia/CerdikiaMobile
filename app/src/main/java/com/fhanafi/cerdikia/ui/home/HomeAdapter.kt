@@ -13,7 +13,7 @@ import com.fhanafi.cerdikia.data.database.MapelEntity
 import com.fhanafi.cerdikia.helper.MapelDescriptionHelper
 
 
-class HomeAdapter(private val itemList: List<MapelEntity>) :
+class  HomeAdapter(private val itemList: List<MapelEntity>) :
     RecyclerView.Adapter<HomeAdapter.ViewHolder>(){
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val titleTextView: TextView = itemView.findViewById(R.id.text_title)
@@ -36,8 +36,14 @@ class HomeAdapter(private val itemList: List<MapelEntity>) :
         // Set OnClickListener for the button if needed
         holder.mulaiButton.setOnClickListener {
             val idMapel = currentItem.id_mapel // From your API response
+            val namaMapel = currentItem.nama_mapel
+            val description = MapelDescriptionHelper.getDescription(namaMapel)
+
             val bundle = Bundle().apply {
                 putInt("idMapel", idMapel) // Pass this to StageFragment
+                putString("namaMapel", namaMapel)
+                putString("description", description)
+
             }
             holder.itemView.findNavController().navigate(R.id.action_navigation_home_to_stageFragment, bundle)
         }

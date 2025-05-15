@@ -20,10 +20,12 @@ import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.databinding.FragmentProfileBinding
 import com.fhanafi.cerdikia.helper.SessionManager
 import com.fhanafi.cerdikia.helper.uriToFile
+import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import com.fhanafi.cerdikia.ui.splashscreen.SplashActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
@@ -45,6 +47,30 @@ class ProfileFragment : Fragment() {
                 userViewModel.uploadProfileImage(email, file)
             }
         }
+
+    private var loadingDialog: LoadingDialogFragment? = null
+    private var isUpdating = false
+    private var isUploading = false
+
+    private fun updateLoadingState() {
+        if (isUpdating || isUploading) {
+            showLoading()
+        } else {
+            hideLoading()
+        }
+    }
+
+    private fun showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = LoadingDialogFragment()
+            loadingDialog?.show(parentFragmentManager, "loading")
+        }
+    }
+
+    private fun hideLoading() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -88,7 +114,6 @@ class ProfileFragment : Fragment() {
             }
 
             userViewModel.updateUserProfile(nama, email, kelas)
-            findNavController().navigate(R.id.navigation_home)
         }
 
         binding.btnKeluar.setOnClickListener {
@@ -117,19 +142,29 @@ class ProfileFragment : Fragment() {
     private fun observeViewModel() {
         var isFirstLoad = true
 
-        userViewModel.isUpdating.observe(viewLifecycleOwner) { isUpdating ->
-            binding.tvSimpan.isEnabled = !isUpdating
-            binding.tvSimpan.alpha = if (isUpdating) 0.5f else 1f
-            binding.progressBar.visibility = if (isUpdating) View.VISIBLE else View.GONE
+        userViewModel.isUpdating.observe(viewLifecycleOwner) { updating ->
+            isUpdating = updating
+            updateLoadingState()
 
-            if (!isUpdating && !isFirstLoad) {
+            binding.tvSimpan.isEnabled = !updating
+            binding.tvSimpan.alpha = if (updating) 0.5f else 1f
+
+            if (!updating && !isFirstLoad) {
                 Toast.makeText(requireContext(), "Profile berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+//                findNavController().navigate(R.id.navigation_home)
             }
             isFirstLoad = false
         }
 
+        userViewModel.isUploading.observe(viewLifecycleOwner) { uploading ->
+            isUploading = uploading
+            updateLoadingState()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
+            showLoading()
             userViewModel.userData.collect { user ->
+                delay(2000)
                 binding.editTextNama.setText(user.nama)
                 binding.editTextEmail.setText(user.email)
                 binding.editTextKelas.setText(user.kelas.toString())
@@ -140,10 +175,8 @@ class ProfileFragment : Fragment() {
                     .error(R.drawable.player_holder)
                     .circleCrop()
                     .into(binding.viewProfilePlaceholder)
+                hideLoading()
             }
-        }
-        userViewModel.isUploading.observe(viewLifecycleOwner) { uploading ->
-            binding.progressBar.visibility = if (uploading) View.VISIBLE else View.GONE
         }
     }
 

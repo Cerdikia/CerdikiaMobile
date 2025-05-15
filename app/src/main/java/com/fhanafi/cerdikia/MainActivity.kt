@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                                 ShimmerTopBar()
                             } else {
                                 PlayerStatusBar(
-                                    flagResourceId = mainViewModel.playerFlag, // Use mainViewModel
+                                    flagResourceId = R.drawable.ic_indoflag, // Use mainViewModel
                                     gemImageResourceId = R.drawable.ic_gems,
                                     gemCount = userData.gems, // Use mainViewModel
                                     energyImageResourceId = R.drawable.ic_lighting,

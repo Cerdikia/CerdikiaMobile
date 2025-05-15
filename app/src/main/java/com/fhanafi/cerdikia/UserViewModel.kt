@@ -34,7 +34,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     fun updateUserProfile(nama: String, email: String, kelas: Int) {
         viewModelScope.launch {
-            _isUpdating.value = false
+            _isUpdating.value = true
             try {
                 // 1. Update dari server
                 val updatedUser = userRepository.updateProfileFromApi(nama, email, kelas)
