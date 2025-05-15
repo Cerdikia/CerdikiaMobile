@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia.data.repository
 
+import com.fhanafi.cerdikia.data.remote.response.EnergyData
 import com.fhanafi.cerdikia.data.remote.response.SoalDataItem
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import com.fhanafi.cerdikia.ui.stage.MateriItem
@@ -36,6 +37,11 @@ class MateriRepository(private val apiService: ApiService) {
         if (!response.message.orEmpty().contains("success", ignoreCase = true)) {
             throw Exception("Failed to use energy: ${response.message}")
         }
+    }
+
+    suspend fun getEnergy(email: String): EnergyData? {
+        val response = apiService.getEnergy(email)
+        return response.data
     }
 
     companion object {

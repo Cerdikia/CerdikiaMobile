@@ -13,7 +13,7 @@ import com.fhanafi.cerdikia.data.database.MapelEntity
 import com.fhanafi.cerdikia.helper.MapelDescriptionHelper
 
 
-class HomeAdapter(private val itemList: List<MapelEntity>) :
+class  HomeAdapter(private val itemList: List<MapelEntity>) :
     RecyclerView.Adapter<HomeAdapter.ViewHolder>(){
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val titleTextView: TextView = itemView.findViewById(R.id.text_title)

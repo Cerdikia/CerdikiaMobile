@@ -1,6 +1,7 @@
 package com.fhanafi.cerdikia.ui.stage
 
 import androidx.lifecycle.*
+import com.fhanafi.cerdikia.data.remote.response.EnergyData
 import com.fhanafi.cerdikia.data.repository.MateriRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,14 @@ class StageViewModel(private val materiRepository: MateriRepository) : ViewModel
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    suspend fun getEnergy(email: String): EnergyData? {
+        return try {
+            materiRepository.getEnergy(email)
+        } catch (e: Exception) {
+            null
         }
     }
 }
