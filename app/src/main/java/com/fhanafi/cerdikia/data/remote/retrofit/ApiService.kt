@@ -27,6 +27,7 @@ import com.fhanafi.cerdikia.data.remote.response.UpdatePointResponse
 import com.fhanafi.cerdikia.data.remote.response.UpdateProfileResponse
 import com.fhanafi.cerdikia.data.remote.response.UseEnergyResponse
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -133,4 +134,9 @@ interface ApiService {
     suspend fun postGift(
       @Body reedemGiftRequest: ReedemGiftRequest
     ): ReedemGiftResponse
+
+    @GET("print-receipt/{kodePenukaran}")
+    suspend fun getReceipt(
+        @Path("kodePenukaran") kodePenukaran: String
+    ): ResponseBody
 }

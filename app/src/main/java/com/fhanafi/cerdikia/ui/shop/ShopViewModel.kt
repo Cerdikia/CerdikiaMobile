@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
 
 class ShopViewModel(
     private val shopRepository: ShopRepository
@@ -43,8 +44,8 @@ class ShopViewModel(
         }
     }
 
-    private val _redeemResult = MutableStateFlow<Result<ReedemGiftResponse>?>(null)
-    val redeemResult: StateFlow<Result<ReedemGiftResponse>?> = _redeemResult
+    private val _redeemResult = MutableStateFlow<Result<Pair<ReedemGiftResponse, String?>>?>(null)
+    val redeemResult: StateFlow<Result<Pair<ReedemGiftResponse, String?>>?> = _redeemResult
 
     fun redeemGifts(items: List<ReedemItem>) {
         viewModelScope.launch {
@@ -52,6 +53,16 @@ class ShopViewModel(
             val result = shopRepository.redeemGifts(items)
             _redeemResult.value = result
             _isLoading.value = false
+        }
+    }
+
+    private val _receiptFile = MutableStateFlow<Result<ResponseBody>?>(null)
+    val receiptFile: StateFlow<Result<ResponseBody>?> = _receiptFile
+
+    fun downloadReceipt(kodePenukaran: String) {
+        viewModelScope.launch {
+            val result = shopRepository.downloadReceipt(kodePenukaran)
+            _receiptFile.value = result
         }
     }
 

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import okhttp3.ResponseBody
 
 class ShopRepository private constructor(
     private val apiService: ApiService,
@@ -42,7 +43,7 @@ class ShopRepository private constructor(
         }
     }
 
-    suspend fun redeemGifts(items: List<ReedemItem>): Result<ReedemGiftResponse> {
+    suspend fun redeemGifts(items: List<ReedemItem>): Result<Pair<ReedemGiftResponse, String?>> {
         val user = userPreference.getUserData().firstOrNull()
             ?: return Result.failure(Exception("User email not found"))
 
@@ -60,6 +61,16 @@ class ShopRepository private constructor(
 
         return try {
             val response = apiService.postGift(request)
+            val kode = response.items?.firstOrNull()?.kodePenukaran
+            Result.success(response to kode)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun downloadReceipt(kodePenukaran: String): Result<ResponseBody> {
+        return try {
+            val response = apiService.getReceipt(kodePenukaran)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
