@@ -58,7 +58,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
             misiHarianPreference = MisiHarianPreference(context)
         }
         if (!::shopRepository.isInitialized) {
-            shopRepository = ShopRepository.getInstance(apiService, misiHarianPreference)
+            shopRepository = ShopRepository.getInstance(apiService, misiHarianPreference, pref)
         }
     }
 
@@ -88,9 +88,6 @@ object ViewModelFactory : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(SoalViewModel::class.java) -> {
                 SoalViewModel(materiRepository) as T
             }
-//            modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
-//                ShopViewModel(misiHarianPreference) as T
-//            }
             modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
                 ShopViewModel(shopRepository) as T
             }

@@ -76,7 +76,7 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 userViewModel.userData.collect { user ->
-                    homeViewModel.loadMapels(idKelas = user.kelas, finished = false) // just change it to true if want to fetch finished mapel
+                    homeViewModel.loadMapels(idKelas = user.kelas, finished = true) // just change it to true if want to fetch finished mapel
                 }
             }
         }

@@ -1,12 +1,16 @@
 package com.fhanafi.cerdikia.data.remote.retrofit
 
+import com.fhanafi.cerdikia.data.remote.request.EmailVerifRequest
 import com.fhanafi.cerdikia.data.remote.request.LoginRequest
 import com.fhanafi.cerdikia.data.remote.request.LogsSiswaRequest
+import com.fhanafi.cerdikia.data.remote.request.ReedemGiftRequest
 import com.fhanafi.cerdikia.data.remote.request.RegisterRequest
 import com.fhanafi.cerdikia.data.remote.request.TokenRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdatePointRequest
 import com.fhanafi.cerdikia.data.remote.request.UpdateProfileRequest
+import com.fhanafi.cerdikia.data.remote.response.CekVerifResponse
 import com.fhanafi.cerdikia.data.remote.response.ChangeImageProfileResponse
+import com.fhanafi.cerdikia.data.remote.response.EmailVerifResponse
 import com.fhanafi.cerdikia.data.remote.response.GetEnergyResponse
 import com.fhanafi.cerdikia.data.remote.response.GetMapelResponse
 import com.fhanafi.cerdikia.data.remote.response.GetMateriResponse
@@ -15,6 +19,7 @@ import com.fhanafi.cerdikia.data.remote.response.ListHadiahResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.remote.response.LogsSiswaResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
+import com.fhanafi.cerdikia.data.remote.response.ReedemGiftResponse
 import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
 import com.fhanafi.cerdikia.data.remote.response.SoalResponse
 import com.fhanafi.cerdikia.data.remote.response.TokenResponse
@@ -22,6 +27,7 @@ import com.fhanafi.cerdikia.data.remote.response.UpdatePointResponse
 import com.fhanafi.cerdikia.data.remote.response.UpdateProfileResponse
 import com.fhanafi.cerdikia.data.remote.response.UseEnergyResponse
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -113,4 +119,24 @@ interface ApiService {
     @GET("gifts")
     suspend fun getGifts(
     ): ListHadiahResponse
+
+    @POST("messages")
+    suspend fun sendEmailVerif(
+        @Body emailVerifRequest: EmailVerifRequest
+    ) : EmailVerifResponse
+
+    @GET("verified")
+    suspend fun getVerified(
+        @Query("email") email: String
+    ): CekVerifResponse
+
+    @POST("redeem-gifts")
+    suspend fun postGift(
+      @Body reedemGiftRequest: ReedemGiftRequest
+    ): ReedemGiftResponse
+
+    @GET("print-receipt/{kodePenukaran}")
+    suspend fun getReceipt(
+        @Path("kodePenukaran") kodePenukaran: String
+    ): ResponseBody
 }

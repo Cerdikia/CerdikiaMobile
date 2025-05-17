@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
+import android.widget.Toast
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.DailyQuestUtils
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
+import com.fhanafi.cerdikia.helper.PdfUtils
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -35,6 +37,7 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
     }
     private var countDownTimer: CountDownTimer? = null
     private var loadingDialog: LoadingDialogFragment? = null
+    private lateinit var tokoAdapter: TokoAdapter
 
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -58,11 +61,74 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         observeLoadingState()
         shopViewModel.loadHadiahList()
         shopViewModel.checkAndResetQuestIfNeeded()
+        shopViewModel.fetchVerifiedStatus() // <- Fetch verified status
+        observeVerifiedStatus()             // <- Observe and wait before loading adapter
+        observeRedeemReceipts()
         observeDailyQuest()
-        observeHadiahList()
+        observeRedeemGifts()
         onBackButtonPressed()
+        sendReedemGifts()
         return root
     }
+
+    private fun sendReedemGifts(){
+        binding?.buttonTukarkan?.setOnClickListener {
+            val selectedItems = tokoAdapter.getSelectedItems()
+            if (selectedItems.isEmpty()) {
+                Toast.makeText(requireContext(), "Tidak ada item yang dipilih", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            shopViewModel.redeemGifts(selectedItems)
+        }
+        binding?.buttonBatal?.setOnClickListener {
+            tokoAdapter.resetSelection()
+            updateExchangeButtonVisibility()
+        }
+
+    }
+
+    private fun observeRedeemGifts() {
+        @Suppress("DEPRECATION")
+        lifecycleScope.launchWhenStarted {
+            shopViewModel.redeemResult.collect { result ->
+                result?.onSuccess { (response, kodePenukaran) ->
+                    tokoAdapter.resetSelection()
+                    updateExchangeButtonVisibility()
+                    userViewModel.refreshPointData()
+                    showRedeemSuccessPopup(kodePenukaran)
+                }?.onFailure {
+                    Toast.makeText(requireContext(), "Gagal menukarkan hadiah: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    // Observe receipt file
+    private fun observeRedeemReceipts(){
+        @Suppress("DEPRECATION")
+        lifecycleScope.launchWhenStarted {
+            shopViewModel.receiptFile.collect { result ->
+                result?.onSuccess { responseBody ->
+                    PdfUtils.savePdfToStorage(requireContext(), responseBody)
+                }?.onFailure {
+                    Toast.makeText(requireContext(), "Gagal mengunduh bukti: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    // Showing Reedem Popup & handle Download Bukti button here
+    private fun showRedeemSuccessPopup(kodePenukaran: String?) {
+        val dialog = RedeemSuccessDialogFragment()
+        dialog.onDownload = {
+            kodePenukaran?.let {
+                shopViewModel.downloadReceipt(it)
+            }
+            Toast.makeText(requireContext(), "Mengunduh bukti...", Toast.LENGTH_SHORT).show()
+        }
+        dialog.show(childFragmentManager, "redeem_success")
+    }
+
     // Implement the methods from OnShopItemInteractionListener
     private fun updateExchangeButtonVisibility() {
         val adapter = binding?.recyclerViewToko?.adapter as? TokoAdapter
@@ -79,20 +145,38 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         updateExchangeButtonVisibility()
     }
 
-    private fun observeHadiahList() {
+    override fun onVerifikasiClicked() {
+        // Example: navigate to verification screen
+        shopViewModel.sendEmailVerification()
+        Toast.makeText(requireContext(), "Email verifikasi telah dikirim ulang.", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun observeHadiahList(verifiedStatus: String) {
         val recycleViewToko = binding!!.recyclerViewToko
         recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        // Observe the list of gifts from ShopViewModel
+
         shopViewModel.hadiahList.onEach { tokoList ->
-            // Update RecyclerView adapter with the new list of gifts
-            val adapterToko = TokoAdapter(tokoList, this)
-            recycleViewToko.adapter = adapterToko
+            tokoAdapter = TokoAdapter(
+                tokoList,
+                listener = this@ShopFragment,
+                verifiedStatus = verifiedStatus,
+                fragmentManager = childFragmentManager
+            )
+            recycleViewToko.adapter = tokoAdapter
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
+
 
     private fun observeLoadingState() {
         shopViewModel.isLoading.onEach { isLoading ->
             if (isLoading) showLoading() else hideLoading()
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun observeVerifiedStatus() {
+        shopViewModel.verifData.onEach { verifData ->
+            val verifiedStatus = verifData?.verifiedStatus ?: "unknown" // handle nulls
+            observeHadiahList(verifiedStatus)
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.MisiHarianData
 import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
+import com.fhanafi.cerdikia.data.remote.request.ReedemGiftRequest
+import com.fhanafi.cerdikia.data.remote.response.EmailVerifResponse
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
+import com.fhanafi.cerdikia.data.remote.response.ReedemGiftResponse
+import com.fhanafi.cerdikia.data.remote.response.VerifData
 import com.fhanafi.cerdikia.data.repository.ShopRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
 
 class ShopViewModel(
     private val shopRepository: ShopRepository
@@ -36,6 +41,47 @@ class ShopViewModel(
             }finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private val _redeemResult = MutableStateFlow<Result<Pair<ReedemGiftResponse, String?>>?>(null)
+    val redeemResult: StateFlow<Result<Pair<ReedemGiftResponse, String?>>?> = _redeemResult
+
+    fun redeemGifts(items: List<ReedemItem>) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = shopRepository.redeemGifts(items)
+            _redeemResult.value = result
+            _isLoading.value = false
+        }
+    }
+
+    private val _receiptFile = MutableStateFlow<Result<ResponseBody>?>(null)
+    val receiptFile: StateFlow<Result<ResponseBody>?> = _receiptFile
+
+    fun downloadReceipt(kodePenukaran: String) {
+        viewModelScope.launch {
+            val result = shopRepository.downloadReceipt(kodePenukaran)
+            _receiptFile.value = result
+        }
+    }
+
+    private val _verifData = MutableStateFlow<VerifData?>(null)
+    val verifData: StateFlow<VerifData?> = _verifData
+
+    fun fetchVerifiedStatus() {
+        viewModelScope.launch {
+            _verifData.value = shopRepository.getVerifiedStatus()
+        }
+    }
+
+    private val _emailVerifResult = MutableStateFlow<Result<EmailVerifResponse>?>(null)
+    val emailVerifResult: StateFlow<Result<EmailVerifResponse>?> = _emailVerifResult
+
+    fun sendEmailVerification() {
+        viewModelScope.launch {
+            val result = shopRepository.sendEmailVerification()
+            _emailVerifResult.value = result
         }
     }
 

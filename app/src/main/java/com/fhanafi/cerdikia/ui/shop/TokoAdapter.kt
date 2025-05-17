@@ -1,5 +1,9 @@
 package com.fhanafi.cerdikia.ui.shop
 
+import android.app.AlertDialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,16 +13,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
+import com.fhanafi.cerdikia.helper.setMarginTop
 
 class TokoAdapter(
     private val tokoList: List<HadiahDataItem>,
-    private val listener: OnShopItemInteractionListener? = null
+    private val listener: OnShopItemInteractionListener? = null,
+    private val verifiedStatus: String?, // <-- Add this
+    private val fragmentManager: FragmentManager
 ) :
     RecyclerView.Adapter<TokoAdapter.TokoViewHolder>(){
 
@@ -46,7 +53,6 @@ class TokoAdapter(
         val currentToko = tokoList[position]
         Glide.with(holder.itemView.context)
             .load(currentToko.img ?: "") // fallback to empty URL if null
-            .apply(RequestOptions().override(85, 85).fitCenter()) // Or .centerCrop()
             .into(holder.iconImageView)
 
         holder.priceTextView.text = currentToko.diamond.toString()
@@ -66,10 +72,14 @@ class TokoAdapter(
             holder.gemsImageView.visibility = View.VISIBLE
             holder.buyButton.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white)) // Set text color to white
             holder.buyButton.setOnClickListener {
-                itemCounts[position] = 1
-                notifyItemChanged(position) // Rebind to show +/-
-                listener?.onItemBought(currentToko)
-                // Handle the initial "buy" action (e.g., check gems)
+                if (verifiedStatus.equals("waiting", ignoreCase = true) ||
+                    verifiedStatus.equals("rejected", ignoreCase = true)) {
+                    showVerificationPopup(holder.itemView.context)
+                } else {
+                    itemCounts[position] = 1
+                    notifyItemChanged(position) // Rebind to show +/-
+                    listener?.onItemBought(currentToko)
+                }
             }
         }
 
@@ -109,4 +119,55 @@ class TokoAdapter(
 
     override fun getItemCount() = tokoList.size
 
+    private fun showVerificationPopup(context: Context) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.popup_verifikasi, null)
+        val alertDialog = AlertDialog.Builder(context).setView(dialogView).create()
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val textViewMessage = dialogView.findViewById<TextView>(R.id.textViewMessage)
+        val btnVerifikasi = dialogView.findViewById<Button>(R.id.btn_verifikasi)
+        val imgKucing = dialogView.findViewById<ImageView>(R.id.img_kucing)
+        val closeButton = dialogView.findViewById<TextView>(R.id.textViewClose)
+
+        // Hide everything first
+        textViewMessage.visibility = View.GONE
+        btnVerifikasi.visibility = View.GONE
+        imgKucing.visibility = View.GONE
+
+        if (verifiedStatus.equals("waiting", ignoreCase = true)) {
+            textViewMessage.text = "Akun kamu sedang dalam proses verifikasi."
+            textViewMessage.visibility = View.VISIBLE
+            textViewMessage.setMarginTop(24) // created with helper function
+            imgKucing.visibility = View.VISIBLE
+        } else if (verifiedStatus.equals("rejected", ignoreCase = true)) {
+            textViewMessage.text = "Verifikasi akun kamu ditolak. Silakan verifikasi ulang."
+            textViewMessage.visibility = View.VISIBLE
+            btnVerifikasi.visibility = View.VISIBLE
+            btnVerifikasi.text = "Verifikasi Ulang"
+        }
+
+        btnVerifikasi.setOnClickListener {
+            alertDialog.dismiss()
+            // Navigate to verification screen, you can define this via listener
+            listener?.onVerifikasiClicked()
+        }
+
+        closeButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+
+    fun getSelectedItems(): List<ReedemItem> {
+        return itemCounts.map { (position, count) ->
+            val item = tokoList[position]
+            ReedemItem(id_barang = item.idBarang ?: -1, jumlah = count)
+        }.filter { it.id_barang != -1 && it.jumlah > 0 }
+    }
+
+    fun resetSelection() {
+        itemCounts.clear()
+        notifyDataSetChanged()
+    }
 }
