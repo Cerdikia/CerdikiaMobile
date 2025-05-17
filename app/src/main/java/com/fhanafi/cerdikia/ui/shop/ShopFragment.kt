@@ -1,8 +1,5 @@
 package com.fhanafi.cerdikia.ui.shop
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,10 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
-import com.fhanafi.cerdikia.data.remote.request.ReedemGiftRequest
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.DailyQuestUtils
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
@@ -29,9 +24,6 @@ import com.fhanafi.cerdikia.helper.PdfUtils
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import okhttp3.ResponseBody
-import java.io.File
-import java.io.FileOutputStream
 
 class ShopFragment : Fragment(), OnShopItemInteractionListener {
 
@@ -123,7 +115,6 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
                 }
             }
         }
-
     }
 
     // Showing Reedem Popup & handle Download Bukti button here

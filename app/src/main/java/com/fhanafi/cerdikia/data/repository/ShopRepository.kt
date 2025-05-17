@@ -36,7 +36,10 @@ class ShopRepository private constructor(
     suspend fun loadGifts() {
         try {
             val response = apiService.getGifts()
-            _gifts.value = response.data?.filterNotNull() ?: emptyList()
+            _gifts.value = response.data
+                ?.filterNotNull()
+                ?.filter { it.jumlah != null && it.jumlah > 0 } //Filter jumlah > 0
+                ?: emptyList()
         } catch (e: Exception) {
             e.printStackTrace()
             // You can add logging or error handling here

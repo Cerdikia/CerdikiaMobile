@@ -13,11 +13,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginTop
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
@@ -55,7 +53,6 @@ class TokoAdapter(
         val currentToko = tokoList[position]
         Glide.with(holder.itemView.context)
             .load(currentToko.img ?: "") // fallback to empty URL if null
-            .apply(RequestOptions().override(85, 85).fitCenter()) // Or .centerCrop()
             .into(holder.iconImageView)
 
         holder.priceTextView.text = currentToko.diamond.toString()
