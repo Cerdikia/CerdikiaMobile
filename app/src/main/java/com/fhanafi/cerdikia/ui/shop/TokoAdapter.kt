@@ -161,4 +161,16 @@ class TokoAdapter(
 
         alertDialog.show()
     }
+
+    fun getSelectedItems(): List<ReedemItem> {
+        return itemCounts.map { (position, count) ->
+            val item = tokoList[position]
+            ReedemItem(id_barang = item.idBarang ?: -1, jumlah = count)
+        }.filter { it.id_barang != -1 && it.jumlah > 0 }
+    }
+
+    fun resetSelection() {
+        itemCounts.clear()
+        notifyDataSetChanged()
+    }
 }

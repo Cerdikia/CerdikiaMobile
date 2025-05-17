@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.data.pref.MisiHarianData
 import com.fhanafi.cerdikia.data.pref.MisiHarianPreference
+import com.fhanafi.cerdikia.data.remote.request.ReedemGiftRequest
 import com.fhanafi.cerdikia.data.remote.response.EmailVerifResponse
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
+import com.fhanafi.cerdikia.data.remote.response.ReedemGiftResponse
 import com.fhanafi.cerdikia.data.remote.response.VerifData
 import com.fhanafi.cerdikia.data.repository.ShopRepository
 import kotlinx.coroutines.delay
@@ -38,6 +40,18 @@ class ShopViewModel(
             }finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private val _redeemResult = MutableStateFlow<Result<ReedemGiftResponse>?>(null)
+    val redeemResult: StateFlow<Result<ReedemGiftResponse>?> = _redeemResult
+
+    fun redeemGifts(items: List<ReedemItem>) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = shopRepository.redeemGifts(items)
+            _redeemResult.value = result
+            _isLoading.value = false
         }
     }
 

@@ -17,6 +17,7 @@ import android.os.CountDownTimer
 import android.widget.Toast
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
+import com.fhanafi.cerdikia.data.remote.request.ReedemGiftRequest
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
 import com.fhanafi.cerdikia.helper.DailyQuestUtils
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
@@ -36,6 +37,7 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
     }
     private var countDownTimer: CountDownTimer? = null
     private var loadingDialog: LoadingDialogFragment? = null
+    private lateinit var tokoAdapter: TokoAdapter
 
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -62,9 +64,42 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         shopViewModel.fetchVerifiedStatus() // <- Fetch verified status
         observeVerifiedStatus()             // <- Observe and wait before loading adapter
         observeDailyQuest()
-//        observeHadiahList()
+        observeRedeemGifts()
         onBackButtonPressed()
+        sendReedemGifts()
         return root
+    }
+
+    private fun sendReedemGifts(){
+        binding?.buttonTukarkan?.setOnClickListener {
+            val selectedItems = tokoAdapter.getSelectedItems()
+            if (selectedItems.isEmpty()) {
+                Toast.makeText(requireContext(), "Tidak ada item yang dipilih", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            shopViewModel.redeemGifts(selectedItems)
+        }
+        binding?.buttonBatal?.setOnClickListener {
+            tokoAdapter.resetSelection()
+            updateExchangeButtonVisibility()
+        }
+
+    }
+
+    private fun observeRedeemGifts() {
+        @Suppress("DEPRECATION")
+        lifecycleScope.launchWhenStarted {
+            shopViewModel.redeemResult.collect { result ->
+                result?.onSuccess {
+                    Toast.makeText(requireContext(), "Berhasil menukarkan hadiah!", Toast.LENGTH_SHORT).show()
+                    tokoAdapter.resetSelection()
+                    updateExchangeButtonVisibility()
+                    userViewModel.refreshPointData()
+                }?.onFailure {
+                    Toast.makeText(requireContext(), "Gagal menukarkan hadiah: ${it.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
     // Implement the methods from OnShopItemInteractionListener
     private fun updateExchangeButtonVisibility() {
@@ -93,13 +128,13 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         recycleViewToko.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         shopViewModel.hadiahList.onEach { tokoList ->
-            val adapter = TokoAdapter(
+            tokoAdapter = TokoAdapter(
                 tokoList,
-                listener = this@ShopFragment, // you already implement OnShopItemInteractionListener
+                listener = this@ShopFragment,
                 verifiedStatus = verifiedStatus,
                 fragmentManager = childFragmentManager
             )
-            recycleViewToko.adapter = adapter
+            recycleViewToko.adapter = tokoAdapter
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
