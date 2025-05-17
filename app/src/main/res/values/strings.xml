@@ -21,4 +21,5 @@
     <string name="foto_profile">Foto Profile</string>
     <string name="tunggu_verifikasi">Akun kamu sedang menunggu\nproses verifikasi. Mohon\ntunggu sebentar ya.</string>
     <string name="verifikasi_sekarang">Verifikasi akun dulu ya, supaya bisa tukar hadiah</string>
+    <string name="item_image">ini adalah gambar item</string>
 </resources>

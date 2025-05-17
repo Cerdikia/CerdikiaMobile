@@ -12,10 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.ViewModelFactory
-import com.fhanafi.cerdikia.data.remote.request.LoginRequest
-import com.fhanafi.cerdikia.data.remote.response.toUserModel
-import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
-import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
+import com.fhanafi.cerdikia.data.mapper.toUserModel
 import com.fhanafi.cerdikia.databinding.ActivityLoginBinding
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
