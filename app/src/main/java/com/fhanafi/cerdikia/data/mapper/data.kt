@@ -1,6 +1,7 @@
-package com.fhanafi.cerdikia.data.remote.response
+package com.fhanafi.cerdikia.data.mapper
 
 import com.fhanafi.cerdikia.data.pref.UserModel
+import com.fhanafi.cerdikia.data.remote.response.Data
 
 fun Data.toUserModel(): UserModel {
     return UserModel(

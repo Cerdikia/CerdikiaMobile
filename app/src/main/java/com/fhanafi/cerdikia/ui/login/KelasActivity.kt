@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.ViewModelFactory
-import com.fhanafi.cerdikia.data.remote.response.toUserModel
+import com.fhanafi.cerdikia.data.mapper.toUserModel
 import com.fhanafi.cerdikia.databinding.ActivityKelasBinding
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch

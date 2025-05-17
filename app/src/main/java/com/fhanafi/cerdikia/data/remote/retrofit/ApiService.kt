@@ -16,6 +16,7 @@ import com.fhanafi.cerdikia.data.remote.response.GetMapelResponse
 import com.fhanafi.cerdikia.data.remote.response.GetMateriResponse
 import com.fhanafi.cerdikia.data.remote.response.GetPointResponse
 import com.fhanafi.cerdikia.data.remote.response.ListHadiahResponse
+import com.fhanafi.cerdikia.data.remote.response.ListHistoryRedeemResponse
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
 import com.fhanafi.cerdikia.data.remote.response.LogsSiswaResponse
 import com.fhanafi.cerdikia.data.remote.response.RangkingResponse
@@ -137,6 +138,16 @@ interface ApiService {
 
     @GET("print-receipt/{kodePenukaran}")
     suspend fun getReceipt(
+        @Path("kodePenukaran") kodePenukaran: String
+    ): ResponseBody
+
+    @GET("redemptions")
+    suspend fun getListRedemption(
+        @Query("email") email: String
+    ): ListHistoryRedeemResponse
+
+    @GET("view-receipt/{kodePenukaran}")
+    suspend fun getWebReceipt(
         @Path("kodePenukaran") kodePenukaran: String
     ): ResponseBody
 }

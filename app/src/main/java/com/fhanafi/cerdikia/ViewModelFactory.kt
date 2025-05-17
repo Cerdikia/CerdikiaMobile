@@ -10,11 +10,13 @@ import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.data.pref.dataStore
 import com.fhanafi.cerdikia.data.remote.retrofit.ApiConfig
 import com.fhanafi.cerdikia.data.repository.AuthRepository
+import com.fhanafi.cerdikia.data.repository.HistoryRepository
 import com.fhanafi.cerdikia.data.repository.MapelRepository
 import com.fhanafi.cerdikia.data.repository.MateriRepository
 import com.fhanafi.cerdikia.data.repository.RangkingRepository
 import com.fhanafi.cerdikia.data.repository.ShopRepository
 import com.fhanafi.cerdikia.data.repository.UserRepository
+import com.fhanafi.cerdikia.ui.history.HistoryViewModel
 import com.fhanafi.cerdikia.ui.home.HomeViewModel
 import com.fhanafi.cerdikia.ui.login.AuthViewModel
 import com.fhanafi.cerdikia.ui.question.SoalViewModel
@@ -30,6 +32,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
     private lateinit var mapelRepository: MapelRepository
     private lateinit var materiRepository: MateriRepository
     private lateinit var shopRepository: ShopRepository
+    private lateinit var historyRepository: HistoryRepository
     @SuppressLint("StaticFieldLeak")
     private lateinit var misiHarianPreference: MisiHarianPreference
 
@@ -59,6 +62,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
         }
         if (!::shopRepository.isInitialized) {
             shopRepository = ShopRepository.getInstance(apiService, misiHarianPreference, pref)
+        }
+        if (!::historyRepository.isInitialized) {
+            historyRepository = HistoryRepository.getInstance(apiService, pref)
         }
     }
 
@@ -90,6 +96,9 @@ object ViewModelFactory : ViewModelProvider.Factory {
             }
             modelClass.isAssignableFrom(ShopViewModel::class.java) -> {
                 ShopViewModel(shopRepository) as T
+            }
+            modelClass.isAssignableFrom(HistoryViewModel::class.java) -> {
+                HistoryViewModel(historyRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

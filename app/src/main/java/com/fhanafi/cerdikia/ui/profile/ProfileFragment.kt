@@ -8,12 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
@@ -77,6 +79,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        onBackButtonPressed()
         return binding.root
     }
 
@@ -185,6 +188,20 @@ class ProfileFragment : Fragment() {
                 hideLoading()
             }
         }
+    }
+
+    private fun onBackButtonPressed() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                findNavController().navigate(R.id.navigation_home)
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as? MainActivity)?.setBottomNavigationVisibility(true)
     }
 
     override fun onDestroyView() {

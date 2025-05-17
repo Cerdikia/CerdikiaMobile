@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     id("com.google.devtools.ksp")
+    id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.protobuf)
 }
 
