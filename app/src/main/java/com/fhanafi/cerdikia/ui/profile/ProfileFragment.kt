@@ -86,6 +86,13 @@ class ProfileFragment : Fragment() {
         setupGoogleSignInClient()
         setupUI()
         observeViewModel()
+        history()
+    }
+
+    private fun history() {
+        binding.btnRiwayat.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_historyFragment)
+        }
     }
 
     private fun setupGoogleSignInClient() {

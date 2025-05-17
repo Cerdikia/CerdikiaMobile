@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#00A2EA"
+    tools:context=".ui.history.HistoryFragment">
+
+    <!-- Toolbar for Back Button and Title -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow"
+            />
+
+        <!-- Title TextView -->
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Penukaran"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_marginStart="16dp"
+            />
+    </LinearLayout>
+    <!-- Left Circle -->
+    <View
+        android:id="@+id/left_circle"
+        android:layout_width="244dp"
+        android:layout_height="244dp"
+        android:background="@drawable/circle_left"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="-120dp"
+        />
+
+    <!-- Right Circle -->
+    <View
+        android:id="@+id/right_circle"
+        android:layout_width="135dp"
+        android:layout_height="135dp"
+        android:background="@drawable/circle_right"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="-40dp"
+        />
+
+    <!-- Top Left Cube -->
+    <ImageView
+        android:id="@+id/top_left_cube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_top_left"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="200dp"
+        android:layout_marginStart="50dp" />
+
+    <!-- Top Right Cube -->
+    <ImageView
+        android:id="@+id/top_right_cube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_top_right"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp" />
+
+    <ImageView
+        android:id="@+id/middle_rectangle_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_middle_right"
+        app:layout_constraintTop_toBottomOf="@id/right_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="15dp"
+        />
+
+    <!-- Middle Rectangle -->
+    <ImageView
+        android:id="@+id/middle_rectangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_middle_left"
+        app:layout_constraintStart_toEndOf="@+id/left_circle"
+        app:layout_constraintTop_toTopOf="@+id/left_circle"
+        android:layout_marginTop="45dp"
+        android:layout_marginStart="16dp"
+         />
+
+    <!-- Bottom Left Cube -->
+    <ImageView
+        android:id="@+id/bottom_left_cube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_bottom_left"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="50dp"
+        android:layout_marginStart="50dp" />
+
+    <!-- Bottom Right Cube -->
+    <ImageView
+        android:id="@+id/bottom_right_cube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cube_bottom_right"
+        app:layout_constraintBottom_toTopOf="@+id/right_rectangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="25dp" />
+
+    <!-- Right Rectangle -->
+    <ImageView
+        android:id="@+id/right_rectangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/circle_right_bottom"
+        app:layout_constraintTop_toTopOf="@id/right_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="550dp"
+        android:layout_marginEnd="-45dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
