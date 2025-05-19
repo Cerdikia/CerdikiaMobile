@@ -11,6 +11,6 @@ fun ListRedeemDataItem.toHistoryItem(): HistoryItem {
         itemCount = jumlah ?: 0,
         status = statusPenukaran ?: "-",
         dateExchange = tanggalPenukaran ?: "-",
-        imageResId = R.drawable.img_pencil // You can later map dynamically
+        imageUrl = img ?: "-" // You can later map dynamically
     )
 }

@@ -90,14 +90,17 @@
             android:src="@drawable/ic_anakperempuan"
             android:layout_marginEnd="8dp" />
 
-        <EditText
+        <com.fhanafi.cerdikia.helper.KelasEditText
             android:id="@+id/et_kelas"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Kelas"
+            android:hint="Kelas (1 - 6)"
             android:inputType="number"
             android:background="@android:color/transparent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:importantForAutofill="no"
+            android:imeOptions="actionDone"
+            />
 
     </LinearLayout>
 
@@ -111,7 +114,7 @@
         android:background="@drawable/bg_buttonblue"
         android:text="Buat Profil"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="@color/button_text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/il_kelas"
