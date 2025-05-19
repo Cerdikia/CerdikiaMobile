@@ -3,6 +3,8 @@ package com.fhanafi.cerdikia.ui.history
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.databinding.ItemHistoryBinding
 
 class HistoryAdapter(
@@ -26,7 +28,11 @@ class HistoryAdapter(
             binding.tvItemCount.text = "X ${item.itemCount}"
             binding.tvStatus.text = item.status
             binding.tvDateExchange.text = "Tanggal Penukaran: ${item.dateExchange}"
-            binding.ivItemImage.setImageResource(item.imageResId)
+            Glide.with(binding.ivItemImage.context)
+                .load(item.imageUrl)
+                .placeholder(R.drawable.placeholder_loading)
+                .error(R.drawable.placeholder_error)
+                .into(binding.ivItemImage)
 
             // Handle click
             binding.root.setOnClickListener {
@@ -53,5 +59,5 @@ data class HistoryItem(
     val itemCount: Int,
     val status: String,
     val dateExchange: String,
-    val imageResId: Int // e.g. R.drawable.img_pencil
+    val imageUrl: String // Ganti dari imageResId ke imageUrl
 )

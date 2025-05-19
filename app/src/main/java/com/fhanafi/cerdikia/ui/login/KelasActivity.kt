@@ -33,13 +33,16 @@ class KelasActivity : AppCompatActivity() {
         // Baca dari Intent
         val nama = intent.getStringExtra("EXTRA_NAMA") ?: ""
         val email = intent.getStringExtra("EXTRA_EMAIL") ?: ""
-
         viewModel.setTempNama(nama)
         viewModel.setTempEmail(email)
         setupListener()
     }
     // TODO: Mencheck di edit text dengan helper untuk mengecek inputan kelas agar mendapat nilai kelas yang pasti satu digit dan tidak diawali dengan 0
     private fun setupListener() {
+        binding.btnCreate.isEnabled = false
+        binding.etKelas.onValidInputChanged = { isValid ->
+            binding.btnCreate.isEnabled = isValid
+        }
         binding.btnCreate.setOnClickListener {
             val kelasStr = binding.etKelas.text.toString()
             if (kelasStr.isNotEmpty()) {
