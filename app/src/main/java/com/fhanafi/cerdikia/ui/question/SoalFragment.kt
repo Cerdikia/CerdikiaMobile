@@ -41,6 +41,7 @@ class SoalFragment : Fragment() {
     private var loadingDialog: LoadingDialogFragment? = null
     private var studyJob: Job? = null
     private val studyInterval = 60_000L // 1 minute
+    private var hasBeenStopped = false
 
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -246,11 +247,39 @@ class SoalFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         startStudyTracking()
+
+        if (hasBeenStopped && !viewModel.isQuizFinished.value) {
+            // Navigasi paksa ke CompletionFragment
+            lifecycleScope.launch {
+                delay(500) // beri delay sedikit agar tidak crash saat nav
+                if (isAdded) {
+                    findNavController().navigate(
+                        R.id.action_soalFragment_to_completionFragment,
+                        Bundle().apply {
+                            putInt("XP", viewModel.correctAnswers * 2)
+                            putInt("GEMS", if (viewModel.correctAnswers > 0) viewModel.correctAnswers * 2 else 0)
+                            putInt("materiId", materiId)
+                            putInt("idMapel", idMapel)
+                            putBoolean("isCompleted", isCompleted)
+                        }
+                    )
+                }
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
         stopStudyTracking()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        hasBeenStopped = true
+
+        if (!viewModel.isQuizFinished.value) {
+            viewModel.forceFinishQuiz()
+        }
     }
 
     private fun startStudyTracking() {

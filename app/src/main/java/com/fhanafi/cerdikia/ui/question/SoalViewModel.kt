@@ -86,6 +86,10 @@ class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
         }
     }
 
+    fun forceFinishQuiz() {
+        _isQuizFinished.value = true
+    }
+
     fun resetQuiz() {
         _questionList.value = emptyList()
         _currentQuestionIndex.value = 0
@@ -96,15 +100,18 @@ class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
     }
 
     private fun SoalDataItem.toQuestion(): Question {
+        val options = listOfNotNull(
+            opsiA?.let { "a" to it },
+            opsiB?.let { "b" to it },
+            opsiC?.let { "c" to it },
+            opsiD?.let { "d" to it }
+        ).shuffled() // <-- Shuffle the answer options here
+
         return Question(
             questionText = soal ?: "",
-            answerOptions = listOfNotNull(
-                opsiA?.let { "a" to it },
-                opsiB?.let { "b" to it },
-                opsiC?.let { "c" to it },
-                opsiD?.let { "d" to it }
-            ),
+            answerOptions = options,
             correctAnswer = jawaban?.lowercase() ?: ""
         )
+
     }
 }
