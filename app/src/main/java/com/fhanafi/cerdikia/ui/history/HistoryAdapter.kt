@@ -2,6 +2,7 @@ package com.fhanafi.cerdikia.ui.history
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.fhanafi.cerdikia.R
@@ -33,6 +34,14 @@ class HistoryAdapter(
                 .placeholder(R.drawable.placeholder_loading)
                 .error(R.drawable.placeholder_error)
                 .into(binding.ivItemImage)
+
+            // Set text color based on status
+            val context = binding.tvStatus.context
+            when (item.status.lowercase()) {
+                "dibatalkan" -> binding.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.redMain))
+                "selesai" -> binding.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.green))
+                else -> binding.tvStatus.setTextColor(ContextCompat.getColor(context, R.color.goldYellow))
+            }
 
             // Handle click
             binding.root.setOnClickListener {

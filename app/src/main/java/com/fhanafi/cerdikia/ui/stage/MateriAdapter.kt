@@ -52,11 +52,6 @@ class MateriAdapter(
                     imageView.setOnClickListener {
                         if (materiItem.isCompleted || index == unlockIndex) {
                             onModulClick(imageView, materiItem)
-//                            val bundle = Bundle().apply {
-//                                putInt("materiId", materiItem.id)
-//                            }
-//                            itemView.findNavController()
-//                                .navigate(R.id.action_stageFragment_to_soalFragment, bundle)
                         }
                     }
 

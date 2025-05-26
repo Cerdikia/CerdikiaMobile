@@ -53,7 +53,7 @@ class SoalViewModel(private val repository: MateriRepository) : ViewModel() {
             try {
                 delay(3000) // biar ada effect loading
                 val soalList = repository.getSoalByModule(idModule)
-                val mapped = soalList.map { it.toQuestion() }
+                val mapped = soalList.shuffled().map { it.toQuestion() } // <- shuffled soal
                 _questionList.value = mapped
                 _currentQuestionIndex.value = 0
                 _correctAnswers = 0
