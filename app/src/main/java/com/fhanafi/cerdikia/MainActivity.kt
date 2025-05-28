@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
 import com.fhanafi.cerdikia.databinding.ActivityMainBinding
 import com.fhanafi.cerdikia.ui.components.BottomNavItem
 import com.fhanafi.cerdikia.ui.components.CustomBottomNavigationBar
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         setupTopBar()
         destinationListener()
     }
+
     private fun setupBottomNavigationBar() {
         binding.composeBottomNav.setContent {
             CerdikiaTheme {

@@ -67,6 +67,7 @@ class SoalFragment : Fragment() {
         idMapel = arguments?.getInt("idMapel") ?: -1
         isCompleted = arguments?.getBoolean("isCompleted") ?: false
         Log.d("StageFragment", "Received idMapel SoalFragment: $idMapel")
+        viewModel.resetQuiz()
         closeButton()
         return binding.root
     }
@@ -249,10 +250,12 @@ class SoalFragment : Fragment() {
         startStudyTracking()
 
         if (hasBeenStopped && !viewModel.isQuizFinished.value) {
-            // Navigasi paksa ke CompletionFragment
+            hasBeenStopped = false // reset so it doesn't navigate again next time
+
             lifecycleScope.launch {
-                delay(500) // beri delay sedikit agar tidak crash saat nav
+                delay(500)
                 if (isAdded) {
+                    viewModel.resetQuiz() // <<< ADD THIS in ViewModel to reset flags
                     findNavController().navigate(
                         R.id.action_soalFragment_to_completionFragment,
                         Bundle().apply {

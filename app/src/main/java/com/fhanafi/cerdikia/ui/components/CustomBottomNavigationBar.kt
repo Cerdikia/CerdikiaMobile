@@ -27,6 +27,7 @@ fun CustomBottomNavigationBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(64.dp)
             .background(MaterialTheme.colorScheme.surface)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically // Align items vertically in the center
