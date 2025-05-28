@@ -22,4 +22,5 @@
     <color name="textColorAnswer">#2D2727</color>
     <color name="grayFieldButton">#EAEAEA</color>
     <color name="popupBorder">#4898BC</color>
+    <color name="green">#4CAF50</color>
 </resources>
