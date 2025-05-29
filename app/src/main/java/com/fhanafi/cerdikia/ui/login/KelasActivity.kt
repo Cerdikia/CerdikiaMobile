@@ -3,6 +3,7 @@ package com.fhanafi.cerdikia.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import com.fhanafi.cerdikia.databinding.ActivityKelasBinding
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.collect
 
 class KelasActivity : AppCompatActivity() {
 
@@ -36,7 +38,18 @@ class KelasActivity : AppCompatActivity() {
         viewModel.setTempNama(nama)
         viewModel.setTempEmail(email)
         setupListener()
+        observeLoadingState()
     }
+
+    private fun observeLoadingState() {
+        lifecycleScope.launch {
+            viewModel.isLoading.collect{ isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.btnCreate.isEnabled = !isLoading
+            }
+        }
+    }
+
     // TODO: Mencheck di edit text dengan helper untuk mengecek inputan kelas agar mendapat nilai kelas yang pasti satu digit dan tidak diawali dengan 0
     private fun setupListener() {
         binding.btnCreate.isEnabled = false
@@ -67,7 +80,7 @@ class KelasActivity : AppCompatActivity() {
                             user?.photoUrl?.toString()?.let { photoUrl ->
                                 viewModel.savePhotoUrl(photoUrl)
                             }
-                            loginResponse.data?.let { data ->
+                            loginResponse?.data?.let { data ->
                                 val userModel = data.toUserModel()
                                 viewModel.saveUserData(userModel.nama, userModel.email, userModel.kelas)
                                 viewModel.saveUserTokens(userModel.accessToken, userModel.refreshToken)

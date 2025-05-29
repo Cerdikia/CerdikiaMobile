@@ -7,9 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.data.pref.UserModel
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
+import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
 import com.fhanafi.cerdikia.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,8 +39,33 @@ class AuthViewModel(
     fun getTempKelas() = _kelas
     fun getTempEmail() = _email
 
-    suspend fun login(email: String) = repository.login(email)
-    suspend fun register(nama: String, email: String, kelas: Int) = repository.register(nama, email, kelas)
+    private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
+    val loginState: StateFlow<LoginUiState> = _loginState
+
+    // Loading state
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    suspend fun login(email: String): LoginResponse? {
+        return try {
+            _loginState.value = LoginUiState.Loading
+            val response = repository.login(email)
+            _loginState.value = LoginUiState.Success
+            response
+        } catch (e: Exception) {
+            _loginState.value = LoginUiState.Error(e.message ?: "Unknown error")
+            null
+        }
+    }
+
+    suspend fun register(nama: String, email: String, kelas: Int): RegisterResponse {
+        _isLoading.value = true
+        return try {
+            repository.register(nama, email, kelas)
+        } finally {
+            _isLoading.value = false
+        }
+    }
 
     fun saveUserAfterRegister() {
         viewModelScope.launch {
@@ -73,4 +101,12 @@ class AuthViewModel(
             LoginActivity::class.java
         }
     }
+}
+
+// sealed class untuk mengatur state login yang biasa digunakan di MVI pattern
+sealed class LoginUiState {
+    object Idle : LoginUiState()
+    object Loading : LoginUiState()
+    object Success : LoginUiState()
+    data class Error(val message: String) : LoginUiState()
 }

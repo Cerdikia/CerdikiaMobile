@@ -3,6 +3,8 @@ package com.fhanafi.cerdikia.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.*
@@ -23,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -43,6 +46,32 @@ class LoginActivity : AppCompatActivity() {
          authViewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
 
         setupListener()
+        observeLoginState()
+    }
+
+    // Observe loading state login menggunakan sealed class UiState pattern yang khusus untuk MVI (Model-View-Intent) tetapi pattern MVVM juga bisa menggunakannya karena bisa lebih akurat untuk mengatur statenya
+    private fun observeLoginState() {
+        lifecycleScope.launch {
+            authViewModel.loginState.collect { state ->
+                when (state) {
+                    is LoginUiState.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.btnLogin.isEnabled = false
+                        binding.btnLogin.isClickable = false
+                    }
+                    is LoginUiState.Success, is LoginUiState.Idle -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.isClickable = true
+                    }
+                    is LoginUiState.Error -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.btnLogin.isEnabled = true
+                        Toast.makeText(this@LoginActivity, state.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupListener() {
@@ -118,7 +147,8 @@ class LoginActivity : AppCompatActivity() {
                 val email = currentUser.email ?: return@launch
 
                 try {
-                    val response = authViewModel.login(email)
+                    // Early return on login error
+                    val response = authViewModel.login(email) ?: return@launch
                     // Simpan hasil login ke DataStore
                     response.data?.let { data ->
                         val userModel = data.toUserModel()
