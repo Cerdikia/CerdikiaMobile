@@ -16,9 +16,18 @@ class MainViewModel : ViewModel() {
     private val _selectedRoute = MutableStateFlow(R.id.navigation_home)
     val selectedRoute: StateFlow<Int> = _selectedRoute
 
+    private val _isNavigationAllowed = MutableStateFlow(true)
+    val isNavigationAllowed: StateFlow<Boolean> = _isNavigationAllowed.asStateFlow()
+
     fun updateSelectedRoute(routeId: Int) {
         viewModelScope.launch {
             _selectedRoute.emit(routeId)
+        }
+    }
+
+    fun setNavigationAllowed(isAllowed: Boolean) {
+        viewModelScope.launch {
+            _isNavigationAllowed.emit(isAllowed)
         }
     }
 }

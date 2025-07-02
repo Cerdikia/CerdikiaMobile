@@ -28,6 +28,8 @@ import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.data.pref.dataStore
 import com.fhanafi.cerdikia.ui.components.ShimmerTopBar
 import com.fhanafi.cerdikia.ui.splashscreen.SplashActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -84,6 +86,7 @@ class MainActivity : AppCompatActivity() {
     @Composable
     fun BottomNavigationBarCompose(viewModel: MainViewModel, navController: NavController) {
         val selectedRoute by viewModel.selectedRoute.collectAsState()
+        val isNavigationAllowed by viewModel.isNavigationAllowed.collectAsState()
 
         val items = remember(selectedRoute) {
             listOf(
@@ -97,8 +100,16 @@ class MainActivity : AppCompatActivity() {
         CustomBottomNavigationBar(
             items = items,
             onItemClick = { item ->
-                viewModel.updateSelectedRoute(item.route)
-                navController.navigate(item.route)
+                if(isNavigationAllowed && item.route != selectedRoute) {
+                    viewModel.setNavigationAllowed(false)
+                    viewModel.updateSelectedRoute(item.route)
+                    navController.navigate(item.route)
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(1000L) // sesuaikan dengan delay yang sesuai
+                        viewModel.setNavigationAllowed(true)
+                    }
+                }
             }
         )
     }

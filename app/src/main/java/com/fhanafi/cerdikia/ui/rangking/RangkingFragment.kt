@@ -13,24 +13,28 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fhanafi.cerdikia.MainViewModel
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.pref.UserPreference
 import com.fhanafi.cerdikia.databinding.FragmentRangkingBinding
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class RangkingFragment : Fragment() {
     private var _binding: FragmentRangkingBinding? = null
     private val binding get() = _binding!!
-
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
     private val rangkingViewModel: RangkingViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
     }
+    private val _rankingLoaded = MutableStateFlow(false)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +44,6 @@ class RangkingFragment : Fragment() {
         _binding = FragmentRangkingBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
-        observeUserData()
         onBackButtonPressed()
         rangkingViewModel.fetchRankingForUser() // <- Refetch when fragment is opened
 
@@ -49,6 +52,8 @@ class RangkingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         badgeVisibiliy()
+        observeUserDataAndUnlockNavigation()
+
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -69,51 +74,55 @@ class RangkingFragment : Fragment() {
                 } else {
                     rangkingViewModel.topPlayerRankingList.collectLatest { list ->
                         binding.rvRangking.adapter = RankingAdapter(list)
+                        _rankingLoaded.value = true
                     }
                 }
             }
         }
     }
 
-    private fun observeUserData() {
+    private fun observeUserDataAndUnlockNavigation() {
         viewLifecycleOwner.lifecycleScope.launch {
-            // Show shimmer while waiting
-            binding.shimmerRankingHeader.visibility = View.VISIBLE
-            binding.shimmerRankingHeader.startShimmer()
+            combine(
+                userViewModel.userData,
+                _rankingLoaded
+            ) { user, isRankingLoaded -> user to isRankingLoaded }
+                .collectLatest { (user, isRankingLoaded) ->
+                    if (!isRankingLoaded) return@collectLatest
 
-            userViewModel.userData.collectLatest { user ->
-                // Hide shimmer when data is ready
-                binding.shimmerRankingHeader.stopShimmer()
-                binding.shimmerRankingHeader.visibility = View.GONE
+                    // Stop shimmer
+                    binding.shimmerRankingHeader.stopShimmer()
+                    binding.shimmerRankingHeader.visibility = View.GONE
 
-                // Now show the real views
-                binding.imgRangking.visibility = View.VISIBLE
-                binding.tvRangkingTitle.visibility = View.VISIBLE
-                binding.tvRangkingDescription.visibility = View.VISIBLE
-                binding.tvRangkingDay.visibility = View.VISIBLE
+                    // Show UI
+                    binding.imgRangking.visibility = View.VISIBLE
+                    binding.tvRangkingTitle.visibility = View.VISIBLE
+                    binding.tvRangkingDescription.visibility = View.VISIBLE
+                    binding.tvRangkingDay.visibility = View.VISIBLE
 
-                // set badge and title based on xp
-                val (badgeResId, title) = when {
-                    user.xp >= 5000 -> R.drawable.ic_diamondrank to "Diamond League"
-                    user.xp >= 3000 -> R.drawable.ic_platinumrank to "Platinum League"
-                    user.xp >= 2000 -> R.drawable.ic_goldrangking to "Gold League"
-                    user.xp >= 1000 -> R.drawable.ic_silverrank to "Silver League"
-                    else -> R.drawable.ic_bronzerank to "Bronze League"
+                    // Determine badge
+                    val (badgeResId, title) = when {
+                        user.xp >= 5000 -> R.drawable.ic_diamondrank to "Diamond League"
+                        user.xp >= 3000 -> R.drawable.ic_platinumrank to "Platinum League"
+                        user.xp >= 2000 -> R.drawable.ic_goldrangking to "Gold League"
+                        user.xp >= 1000 -> R.drawable.ic_silverrank to "Silver League"
+                        else -> R.drawable.ic_bronzerank to "Bronze League"
+                    }
+
+                    binding.imgRangking.setImageResource(badgeResId)
+                    binding.tvRangkingTitle.text = title
+
+                    // Add user to list and update adapter
+                    val currentList = rangkingViewModel.topPlayerRankingList.value ?: return@collectLatest
+                    val dynamicList = (currentList.filterNot { it.isCurrentUser } +
+                            RankingItem(0, user.nama, user.xp, isCurrentUser = true, photoUrl = user.photoUrl))
+                        .sortedByDescending { it.xp }
+                        .mapIndexed { index, item -> item.copy(rank = index + 1) }
+
+                    binding.rvRangking.adapter = RankingAdapter(dynamicList)
+
+                    mainViewModel.setNavigationAllowed(true)
                 }
-
-                binding.imgRangking.setImageResource(badgeResId)
-                binding.tvRangkingTitle.text = title
-
-                // update rangking list maybe it change if there has API implementation
-                val currentList = rangkingViewModel.topPlayerRankingList.value ?: return@collectLatest
-                Log.d("RankingPhoto", "Before insert: user photoUrl = ${user.photoUrl}")
-                // Add current user to the list, re-sort by XP descending, then re-assign ranks
-                val dynamicList = (currentList.filterNot { it.isCurrentUser } + RankingItem(0, user.nama, user.xp, isCurrentUser = true, photoUrl = user.photoUrl))
-                    .sortedByDescending { it.xp }
-                    .mapIndexed { index, item -> item.copy(rank = index + 1, photoUrl = item.photoUrl, isCurrentUser = item.isCurrentUser) }
-                Log.d("RankingPhoto", "User photoUrl: ${user.photoUrl}")
-                binding.rvRangking.adapter = RankingAdapter(dynamicList)
-            }
         }
     }
 

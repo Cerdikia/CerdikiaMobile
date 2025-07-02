@@ -34,7 +34,7 @@ class ShopViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try{
-                delay(5000) // walaupun sudah terdelay karena ada observe daily quest local jadi bentrok loading state nya dan kemungkinan loading state hadiah true karena daily quest local telah tersajikan data local nya
+                delay(1000) // walaupun sudah terdelay karena ada observe daily quest local jadi bentrok loading state nya dan kemungkinan loading state hadiah true karena daily quest local telah tersajikan data local nya
                 shopRepository.loadGifts()
             }catch (e: Exception){
                 e.printStackTrace()

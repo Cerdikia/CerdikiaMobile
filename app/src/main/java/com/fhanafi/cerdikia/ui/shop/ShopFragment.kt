@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
 import android.widget.Toast
+import com.fhanafi.cerdikia.MainViewModel
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
 import com.fhanafi.cerdikia.data.remote.response.HadiahDataItem
@@ -22,6 +23,8 @@ import com.fhanafi.cerdikia.helper.DailyQuestUtils
 import com.fhanafi.cerdikia.helper.OnShopItemInteractionListener
 import com.fhanafi.cerdikia.helper.PdfUtils
 import com.fhanafi.cerdikia.ui.loading.LoadingDialogFragment
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -29,6 +32,7 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
 
     private var _binding: FragmentShopBinding? = null
     private val binding get() = _binding
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory.getInstance(requireContext())
     }
@@ -38,6 +42,7 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
     private var countDownTimer: CountDownTimer? = null
     private var loadingDialog: LoadingDialogFragment? = null
     private lateinit var tokoAdapter: TokoAdapter
+    private val _shopDataLoaded = MutableStateFlow(false)
 
     private fun showLoading() {
         if (loadingDialog == null) {
@@ -50,25 +55,41 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
         loadingDialog?.dismiss()
         loadingDialog = null
     }
+
+    private fun observeShopNavigationUnlock() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            _shopDataLoaded.collectLatest { loaded ->
+                if (loaded) {
+                    mainViewModel.setNavigationAllowed(true)
+                }
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentShopBinding.inflate(inflater, container, false)
-        val root: View = binding!!.root
+        return binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         observeLoadingState()
-        shopViewModel.loadHadiahList()
-        shopViewModel.checkAndResetQuestIfNeeded()
-        shopViewModel.fetchVerifiedStatus() // <- Fetch verified status
-        observeVerifiedStatus()             // <- Observe and wait before loading adapter
+        observeVerifiedStatus()
         observeRedeemReceipts()
         observeDailyQuest()
         observeRedeemGifts()
-        onBackButtonPressed()
+        observeShopNavigationUnlock()
+
+        shopViewModel.loadHadiahList()
+        shopViewModel.checkAndResetQuestIfNeeded()
+        shopViewModel.fetchVerifiedStatus()
         sendReedemGifts()
-        return root
+        onBackButtonPressed()
     }
 
     private fun sendReedemGifts(){
@@ -233,6 +254,7 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
                     userViewModel.updateGemsFromMissionReward(10)
                     shopViewModel.setStudyTimeRewardClaimed(true)
                 }
+                _shopDataLoaded.value = true
             }
         }
     }

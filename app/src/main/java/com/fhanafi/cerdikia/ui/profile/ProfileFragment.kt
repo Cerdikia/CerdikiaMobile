@@ -11,11 +11,13 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.fhanafi.cerdikia.MainActivity
+import com.fhanafi.cerdikia.MainViewModel
 import com.fhanafi.cerdikia.R
 import com.fhanafi.cerdikia.UserViewModel
 import com.fhanafi.cerdikia.ViewModelFactory
@@ -35,7 +37,7 @@ class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val userViewModel: UserViewModel by viewModels {
         ViewModelFactory.getInstance(requireContext())
     }
@@ -105,7 +107,6 @@ class ProfileFragment : Fragment() {
             .build()
         googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
-    // TODO: showing the profile picture from firebase
     private fun setupUI() {
         binding.tvSimpan.setOnClickListener {
             val nama = binding.editTextNama.text.toString().trim()
@@ -174,7 +175,7 @@ class ProfileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             showLoading()
             userViewModel.userData.collect { user ->
-                delay(2000)
+                delay(1000)
                 binding.editTextNama.setText(user.nama)
                 binding.editTextEmail.setText(user.email)
                 binding.editTextKelas.setText(user.kelas.toString())
@@ -186,6 +187,7 @@ class ProfileFragment : Fragment() {
                     .circleCrop()
                     .into(binding.viewProfilePlaceholder)
                 hideLoading()
+                mainViewModel.setNavigationAllowed(true) // signal to navigation that it's safe to navigate
             }
         }
     }
