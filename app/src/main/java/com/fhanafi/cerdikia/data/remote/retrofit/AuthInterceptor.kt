@@ -6,13 +6,15 @@ import com.fhanafi.cerdikia.data.remote.request.TokenRequest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
+import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class AuthInterceptor(
-    private val userPreference: UserPreference
+    private val userPreference: UserPreference,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -46,7 +48,16 @@ class AuthInterceptor(
                 chain.proceed(newRequest)
             } else {
                 Log.e("AuthInterceptor", "Token refresh failed. Session expired.")
-                response
+                runBlocking { userPreference.clearData() } // berhasil di clear asumsi
+                // buat ngehandle exception agar tidak force close akan tetapi aplikasi masih tetap bisa dibuka dan tidak redirect ke SplashScreenActivity somehow
+                return Response.Builder()
+                    .request(originalRequest)
+                    .protocol(Protocol.HTTP_1_1)
+                    .code(401)
+                    .message("Unauthorized - Token Refresh Failed")
+                    .body(ResponseBody.create(null, ""))
+                    .build()
+
             }
         }
 
@@ -59,7 +70,7 @@ class AuthInterceptor(
 
         return try {
             val retrofit = Retrofit.Builder()
-                .baseUrl("https://cerdikia-backend.raffimrg.my.id")
+                .baseUrl("https://cerdikia-backend-2.raffimrg.my.id/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 

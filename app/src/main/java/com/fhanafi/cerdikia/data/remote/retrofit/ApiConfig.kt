@@ -21,7 +21,7 @@ class ApiConfig {
                 .build()
 
             val retrofit = Retrofit.Builder()
-                .baseUrl("https://cerdikia-backend.raffimrg.my.id/")
+                .baseUrl("https://cerdikia-backend-2.raffimrg.my.id/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()

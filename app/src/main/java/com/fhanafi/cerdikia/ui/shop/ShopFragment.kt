@@ -97,7 +97,9 @@ class ShopFragment : Fragment(), OnShopItemInteractionListener {
                     userViewModel.refreshPointData()
                     showRedeemSuccessPopup(kodePenukaran)
                 }?.onFailure {
-                    Toast.makeText(requireContext(), "Gagal menukarkan hadiah: ${it.message}", Toast.LENGTH_LONG).show()
+                    tokoAdapter.resetSelection()
+                    updateExchangeButtonVisibility()
+                    Toast.makeText(requireContext(), "Gagal menukarkan hadiah Gems tidak mencukupi", Toast.LENGTH_LONG).show()
                 }
             }
         }

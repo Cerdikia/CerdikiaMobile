@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.*
@@ -28,6 +27,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class LoginActivity : AppCompatActivity() {
 
@@ -52,24 +52,9 @@ class LoginActivity : AppCompatActivity() {
     // Observe loading state login menggunakan sealed class UiState pattern yang khusus untuk MVI (Model-View-Intent) tetapi pattern MVVM juga bisa menggunakannya karena bisa lebih akurat untuk mengatur statenya
     private fun observeLoginState() {
         lifecycleScope.launch {
-            authViewModel.loginState.collect { state ->
-                when (state) {
-                    is LoginUiState.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.btnLogin.isEnabled = false
-                        binding.btnLogin.isClickable = false
-                    }
-                    is LoginUiState.Success, is LoginUiState.Idle -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.btnLogin.isEnabled = true
-                        binding.btnLogin.isClickable = true
-                    }
-                    is LoginUiState.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.btnLogin.isEnabled = true
-                        Toast.makeText(this@LoginActivity, state.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
+            authViewModel.isLoading.collect{ isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.btnLogin.isEnabled = !isLoading
             }
         }
     }
@@ -171,16 +156,27 @@ class LoginActivity : AppCompatActivity() {
                     }
                     finish()
 
-                } catch (e: Exception) {
+                } catch (e: HttpException) {
+                    if (e.code() == 401) {
+                        Log.d("LoginActivity", "Login failed with 401 - redirecting to NamaActivity")
+                        navigateToNamaActivity(email)
+                        finish()
+                    } else {
+                        e.printStackTrace()
+                    }
+                }catch (e: Exception){
+                    navigateToNamaActivity(email)
                     e.printStackTrace()
-                    // Kalau gagal login ke API (mungkin karena user baru), berarti harus daftar
-                    val intent = Intent(this@LoginActivity, NamaActivity::class.java)
-                    intent.putExtra("EXTRA_EMAIL",email)
-                    startActivity(intent)
-                    finish()
                 }
             }
         }
+    }
+
+    private fun navigateToNamaActivity(email: String) {
+        val intent = Intent(this@LoginActivity, NamaActivity::class.java)
+        intent.putExtra("EXTRA_EMAIL", email)
+        startActivity(intent)
+        finish()
     }
 
     override fun onStart() {

@@ -6,98 +6,236 @@
     android:layout_marginBottom="16dp"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/icon_materi"
+    <FrameLayout
+        android:id="@+id/icon_container1"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="16dp"
-        android:contentDescription="Materi Icon"
-        android:src="@drawable/ic_unlock"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi2"
+        <ImageView
+            android:id="@+id/icon_materi1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Materi Icon"
+            android:src="@drawable/ic_unlock" />
+
+        <TextView
+            android:id="@+id/text_materi1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="1"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container2"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="80dp"
-        android:contentDescription="Materi Icon"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi3"
+        <ImageView
+            android:id="@+id/icon_materi2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="2"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container3"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="160dp"
-        android:contentDescription="Materi Icon"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi2" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi4"
+        <ImageView
+            android:id="@+id/icon_materi3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="3"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container4"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="80dp"
-        android:contentDescription="Materi Icon"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi3" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi5"
+        <ImageView
+            android:id="@+id/icon_materi4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="4"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container5"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
-        android:contentDescription="Materi Icon"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi4" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi6"
+        <ImageView
+            android:id="@+id/icon_materi5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="5"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container6"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="120dp"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi5"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi7"
+        <ImageView
+            android:id="@+id/icon_materi6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="6"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container7"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="200dp"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi6"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <ImageView
-        android:id="@+id/icon_materi8"
+        <ImageView
+            android:id="@+id/icon_materi7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="7"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/icon_container8"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="120dp"
-        android:src="@drawable/ic_lock"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_container7"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icon_materi7"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageView
+            android:id="@+id/icon_materi8"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_lock"
+            android:contentDescription="Materi Icon" />
+
+        <TextView
+            android:id="@+id/text_materi8"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="8"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
