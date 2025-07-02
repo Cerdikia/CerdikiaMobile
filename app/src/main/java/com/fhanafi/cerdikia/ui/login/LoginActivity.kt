@@ -3,6 +3,7 @@ package com.fhanafi.cerdikia.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.*
@@ -23,8 +24,10 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class LoginActivity : AppCompatActivity() {
 
@@ -43,6 +46,17 @@ class LoginActivity : AppCompatActivity() {
          authViewModel = ViewModelProvider(this, ViewModelFactory.getInstance(this))[AuthViewModel::class.java]
 
         setupListener()
+        observeLoginState()
+    }
+
+    // Observe loading state login menggunakan sealed class UiState pattern yang khusus untuk MVI (Model-View-Intent) tetapi pattern MVVM juga bisa menggunakannya karena bisa lebih akurat untuk mengatur statenya
+    private fun observeLoginState() {
+        lifecycleScope.launch {
+            authViewModel.isLoading.collect{ isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.btnLogin.isEnabled = !isLoading
+            }
+        }
     }
 
     private fun setupListener() {
@@ -118,7 +132,8 @@ class LoginActivity : AppCompatActivity() {
                 val email = currentUser.email ?: return@launch
 
                 try {
-                    val response = authViewModel.login(email)
+                    // Early return on login error
+                    val response = authViewModel.login(email) ?: return@launch
                     // Simpan hasil login ke DataStore
                     response.data?.let { data ->
                         val userModel = data.toUserModel()
@@ -141,16 +156,27 @@ class LoginActivity : AppCompatActivity() {
                     }
                     finish()
 
-                } catch (e: Exception) {
+                } catch (e: HttpException) {
+                    if (e.code() == 401) {
+                        Log.d("LoginActivity", "Login failed with 401 - redirecting to NamaActivity")
+                        navigateToNamaActivity(email)
+                        finish()
+                    } else {
+                        e.printStackTrace()
+                    }
+                }catch (e: Exception){
+                    navigateToNamaActivity(email)
                     e.printStackTrace()
-                    // Kalau gagal login ke API (mungkin karena user baru), berarti harus daftar
-                    val intent = Intent(this@LoginActivity, NamaActivity::class.java)
-                    intent.putExtra("EXTRA_EMAIL",email)
-                    startActivity(intent)
-                    finish()
                 }
             }
         }
+    }
+
+    private fun navigateToNamaActivity(email: String) {
+        val intent = Intent(this@LoginActivity, NamaActivity::class.java)
+        intent.putExtra("EXTRA_EMAIL", email)
+        startActivity(intent)
+        finish()
     }
 
     override fun onStart() {

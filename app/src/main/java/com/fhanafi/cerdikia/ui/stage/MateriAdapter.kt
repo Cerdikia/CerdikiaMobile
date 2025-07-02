@@ -1,9 +1,13 @@
 package com.fhanafi.cerdikia.ui.stage
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.fhanafi.cerdikia.R
 
@@ -19,7 +23,7 @@ class MateriAdapter(
 
     inner class MateriViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val iconImageViews = listOf<ImageView>(
-            itemView.findViewById(R.id.icon_materi),
+            itemView.findViewById(R.id.icon_materi1),
             itemView.findViewById(R.id.icon_materi2),
             itemView.findViewById(R.id.icon_materi3),
             itemView.findViewById(R.id.icon_materi4),
@@ -27,6 +31,17 @@ class MateriAdapter(
             itemView.findViewById(R.id.icon_materi6),
             itemView.findViewById(R.id.icon_materi7),
             itemView.findViewById(R.id.icon_materi8)
+        )
+
+        private val iconTextViews = listOf<TextView>(
+            itemView.findViewById(R.id.text_materi1),
+            itemView.findViewById(R.id.text_materi2),
+            itemView.findViewById(R.id.text_materi3),
+            itemView.findViewById(R.id.text_materi4),
+            itemView.findViewById(R.id.text_materi5),
+            itemView.findViewById(R.id.text_materi6),
+            itemView.findViewById(R.id.text_materi7),
+            itemView.findViewById(R.id.text_materi8)
         )
 
         fun bind(startIndex: Int) {
@@ -37,12 +52,15 @@ class MateriAdapter(
                 val imageView = iconImageViews[i]
                 if (index < materiList.size) {
                     val materiItem = materiList[index]
-                    val iconRes = when {
-                        materiItem.isCompleted -> R.drawable.ic_finished
-                        index == unlockIndex -> R.drawable.ic_unlock
-                        else -> R.drawable.ic_lock
+                    if (materiItem.isCompleted) {
+                        imageView.setImageResource(R.drawable.ic_stage) // your stage icon
+                        iconTextViews[i].text = (index + 1).toString()
+                        iconTextViews[i].visibility = View.VISIBLE
+                    } else {
+                        val iconRes = if (index == unlockIndex) R.drawable.ic_unlock else R.drawable.ic_lock
+                        imageView.setImageResource(iconRes)
+                        iconTextViews[i].visibility = View.GONE
                     }
-                    imageView.setImageResource(iconRes)
                     imageView.visibility = View.VISIBLE
 
                     imageView.setOnClickListener {

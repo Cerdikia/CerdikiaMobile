@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.fhanafi.cerdikia.R
 
+// Pop up ini masih belum terpakai di class manapun
 class ExitDialogFragment(private val onExitConfirmed: () -> Unit) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

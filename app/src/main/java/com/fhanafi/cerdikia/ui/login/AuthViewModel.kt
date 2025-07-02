@@ -7,12 +7,17 @@ import androidx.lifecycle.viewModelScope
 import com.fhanafi.cerdikia.MainActivity
 import com.fhanafi.cerdikia.data.pref.UserModel
 import com.fhanafi.cerdikia.data.remote.response.LoginResponse
+import com.fhanafi.cerdikia.data.remote.response.RegisterResponse
+import com.fhanafi.cerdikia.data.remote.retrofit.ApiService
 import com.fhanafi.cerdikia.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class AuthViewModel(
     private val repository: AuthRepository
@@ -36,8 +41,27 @@ class AuthViewModel(
     fun getTempKelas() = _kelas
     fun getTempEmail() = _email
 
-    suspend fun login(email: String) = repository.login(email)
-    suspend fun register(nama: String, email: String, kelas: Int) = repository.register(nama, email, kelas)
+    // Loading state
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    suspend fun login(email: String) : LoginResponse?{
+      _isLoading.value = true
+      return try {
+          repository.login(email)
+      } finally {
+          _isLoading.value = false
+      }
+    }
+
+    suspend fun register(nama: String, email: String, kelas: Int): RegisterResponse {
+        _isLoading.value = true
+        return try {
+            repository.register(nama, email, kelas)
+        } finally {
+            _isLoading.value = false
+        }
+    }
 
     fun saveUserAfterRegister() {
         viewModelScope.launch {

@@ -1,5 +1,6 @@
 package com.fhanafi.cerdikia
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -21,9 +22,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.fhanafi.cerdikia.data.pref.UserModel
+import com.fhanafi.cerdikia.data.pref.UserPreference
+import com.fhanafi.cerdikia.data.pref.dataStore
 import com.fhanafi.cerdikia.ui.components.ShimmerTopBar
+import com.fhanafi.cerdikia.ui.splashscreen.SplashActivity
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,22 +39,38 @@ class MainActivity : AppCompatActivity() {
     private val mainViewModel: MainViewModel by viewModels() // Gunakan viewModels() untuk mendapatkan ViewModel
     private lateinit var userViewModel: UserViewModel
     private lateinit var composeBottomNavigationView: ComposeView
+    private lateinit var userPreference: UserPreference // Bisa di handle di UserViewModel kemungkinan untuk lebih tercentralisasi sejak userPreference ada di userViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        userPreference = UserPreference.getInstance(dataStore)  // Bisa di handle di UserViewModel kemungkinan untuk lebih tercentralisasi sejak userPreference ada di userViewModel
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         navController = navHostFragment.navController
 
         val factory = ViewModelFactory.getInstance(this)
         userViewModel = ViewModelProvider(this, factory)[UserViewModel::class.java]
-
+        observeUserToken()
         setupBottomNavigationBar()
         setupTopBar()
         destinationListener()
+    }
+
+    private fun observeUserToken() {
+        lifecycleScope.launch {
+            userPreference.getUserData().collect { user ->
+                if (user.accessToken == null || user.refreshToken == null) {
+                    // Navigate to SplashActivity
+                    val intent = Intent(this@MainActivity, SplashActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+            }
+        }
     }
 
     private fun setupBottomNavigationBar() {
