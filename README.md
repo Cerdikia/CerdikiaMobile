@@ -1,4 +1,4 @@
-# 📱 CerdikiaMobile
+# CerdikiaMobile
 
 > Mobile application for quizzes that contribute to educating the nation
 
