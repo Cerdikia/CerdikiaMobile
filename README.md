@@ -12,7 +12,8 @@
   </p>
 
   <h1>CerdikiaMobile</h1>
-  <p>Aplikasi kuis edukasi Android untuk membantu siswa belajar, mengumpulkan XP, dan berkompetisi di papan peringkat.</p>
+  <p>Aplikasi kuis edukasi Android untuk membantu siswa belajar interaktif dengan gamification, mengumpulkan XP, dan berkompetisi di papan peringkat untuk meningkatkan keterlibatan dalam belajar.</p>
+
 </div>
 
 <p align="center">
@@ -67,13 +68,10 @@ Versi pustaka dikelola di [`gradle/libs.versions.toml`](gradle/libs.versions.tom
 
 League ditentukan dari XP pengguna yang tersimpan dan ditampilkan sebagai badge. Ambang berikut mengikuti implementasi di `RangkingFragment`:
 
-| League | XP minimum | Ilustrasi |
-|---|---:|---|
-| Bronze | 0 | ![Bronze League](docs/assets/bronze.svg) |
-| Silver | 1.000 | ![Silver League](docs/assets/silver.svg) |
-| Gold | 2.000 | ![Gold League](docs/assets/gold.svg) |
-| Platinum | 3.000 | ![Platinum League](docs/assets/platinum.svg) |
-| Diamond | 5.000 | ![Diamond League](docs/assets/diamond.svg) |
+| <img src="docs/assets/bronze.svg" alt="Bronze League" width="72" /> | <img src="docs/assets/silver.svg" alt="Silver League" width="72" /> | <img src="docs/assets/gold.svg" alt="Gold League" width="72" /> | <img src="docs/assets/platinum.svg" alt="Platinum League" width="72" /> | <img src="docs/assets/diamond.svg" alt="Diamond League" width="72" /> |
+|:---:|:---:|:---:|:---:|:---:|
+| Bronze | Silver | Gold | Platinum | Diamond |
+| XP minimum: 0 | XP minimum: 1.000 | XP minimum: 2.000 | XP minimum: 3.000 | XP minimum: 5.000 |
 
 Pengguna dengan XP kurang dari 1.000 masuk Bronze. Saat mencapai ambang berikutnya, league berubah ke tier yang sesuai. Daftar pemain dimuat dari endpoint ranking berdasarkan kelas, lalu XP pengguna saat ini dimasukkan dan daftar ditampilkan dari XP tertinggi.
 
